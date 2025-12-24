@@ -5,6 +5,8 @@ import { connectDB } from './config/db.js';
 import productRoutes from './routes/products.js';
 import orderRoutes from './routes/orders.js';
 import Product from './models/Product.js';
+import authRoutes from './routes/auth.js';
+
 
 dotenv.config();
 
@@ -17,6 +19,8 @@ connectDB();
 
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/auth', authRoutes);
+
 
 app.post('/api/seed', async (req, res) => {
   try {
