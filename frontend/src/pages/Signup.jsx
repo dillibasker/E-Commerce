@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import Toast from '../components/Toast';
 
 export default function Signup({ goToLogin }) {
   const [username, setUsername] = useState('');
   const [toast, setToast] = useState(null);
   const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
   const [captcha, setCaptcha] = useState(() => {
     const a = Math.floor(Math.random() * 10);
     const b = Math.floor(Math.random() * 10);
@@ -19,6 +21,7 @@ export default function Signup({ goToLogin }) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         username,
+        email,
         password,
         captchaAnswer: Number(answer),
         captchaExpected: captcha.a + captcha.b
@@ -54,6 +57,15 @@ export default function Signup({ goToLogin }) {
           placeholder="Username"
           value={username}
           onChange={e => setUsername(e.target.value)}
+        />
+
+        <input
+            type="email"
+            className="w-full mb-3 p-2 border rounded"
+            placeholder="Email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            required
         />
 
         <input

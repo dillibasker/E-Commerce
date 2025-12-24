@@ -4,6 +4,7 @@ import Toast from '../components/Toast';
 export default function Login({ onLogin, goToSignup }) {
     const [toast, setToast] = useState(null);
   const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [captcha, setCaptcha] = useState(() => {
     const a = Math.floor(Math.random() * 10);
@@ -20,11 +21,33 @@ export default function Login({ onLogin, goToSignup }) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         username,
+        email,
         password,
         captchaAnswer: Number(answer),
         captchaExpected: captcha.a + captcha.b
       })
     });
+  const data = await res.json();
+
+        if (res.ok) {
+            setToast({ message: 'Password reset email sent!', type: 'success' });
+        } else {
+            setToast({ message: data.message, type: 'error' });
+        }
+    };
+
+    const handleForgotPassword = async () => {
+if (!email) {
+  setToast({ message: 'Please enter your registered email', type: 'error' });
+  return;
+}
+
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/forgot-password`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+    });
+
 
     const data = await res.json();
 
@@ -58,12 +81,25 @@ export default function Login({ onLogin, goToSignup }) {
         />
 
         <input
+            type="email"
+            className="w-full mb-3 p-2 border rounded"
+            placeholder="Email (for forgot password)"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+        />
+
+        <input
           type="password"
           className="w-full mb-3 p-2 border rounded"
           placeholder="Password"
           value={password}
           onChange={e => setPassword(e.target.value)}
         />
+
+        <p className="text-sm text-blue-600 cursor-pointer mb-3" onClick={handleForgotPassword}>
+            Forgot Password?
+        </p>
+
 
         <p className="mb-2">
           {captcha.a} + {captcha.b} = ?
