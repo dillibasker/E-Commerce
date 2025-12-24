@@ -1,6 +1,6 @@
-import { ShoppingCart, Search, Menu } from 'lucide-react';
+import { ShoppingCart, Search, Menu, LogOut } from 'lucide-react';
 
-export default function Header({ cartCount, onCartClick }) {
+export default function Header({ cartCount, onCartClick, onLogout }) {
   return (
     <header className="sticky top-0 z-50 bg-gradient-to-r from-blue-600 to-blue-700 shadow-lg">
       <div className="container mx-auto px-4 py-4">
@@ -14,7 +14,8 @@ export default function Header({ cartCount, onCartClick }) {
             </nav>
           </div>
 
-          <div className="flex items-center space-x-6">
+          <div className="flex items-center space-x-4 md:space-x-6">
+            {/* Search bar */}
             <div className="hidden md:flex items-center bg-white rounded-full px-4 py-2">
               <input
                 type="text"
@@ -24,6 +25,7 @@ export default function Header({ cartCount, onCartClick }) {
               <Search className="w-5 h-5 text-gray-500" />
             </div>
 
+            {/* Cart button */}
             <button
               onClick={onCartClick}
               className="relative bg-yellow-400 hover:bg-yellow-500 text-blue-900 rounded-full p-3 transition transform hover:scale-110"
@@ -36,6 +38,15 @@ export default function Header({ cartCount, onCartClick }) {
               )}
             </button>
 
+            {/* Logout button */}
+            <button
+              onClick={onLogout}
+              className="hidden md:flex items-center bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded transition transform hover:scale-105"
+            >
+              <LogOut className="w-5 h-5 mr-2" /> Logout
+            </button>
+
+            {/* Mobile menu button */}
             <button className="md:hidden text-white">
               <Menu className="w-6 h-6" />
             </button>

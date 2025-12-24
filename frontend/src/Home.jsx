@@ -5,7 +5,7 @@ import ProductDetail from './components/ProductDetail';
 import Cart from './components/Cart';
 import Checkout from './components/Checkout';
 
-function Home() {
+function Home({ onLogout }) {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -70,6 +70,8 @@ function Home() {
       <Header
         cartCount={cart.reduce((sum, item) => sum + item.quantity, 0)}
         onCartClick={() => setShowCart(true)}
+        onLogout={onLogout}
+
       />
 
       {loading ? (
