@@ -28,12 +28,13 @@ export default function Login({ onLogin, goToSignup }) {
       })
     });
   const data = await res.json();
-
         if (res.ok) {
-            setToast({ message: 'Password reset email sent!', type: 'success' });
-        } else {
-            setToast({ message: data.message, type: 'error' });
-        }
+      setToast({ message: 'Login successful!', type: 'success' });
+      setTimeout(onLogin, 1800);
+    } else {
+      setToast({ message: data.message, type: 'error' });
+    }
+        
     };
 
     const handleForgotPassword = async () => {
@@ -50,13 +51,12 @@ if (!email) {
 
 
     const data = await res.json();
-
-     if (res.ok) {
-      setToast({ message: 'Login successful!', type: 'success' });
-      setTimeout(onLogin, 1800);
-    } else {
-      setToast({ message: data.message, type: 'error' });
-    }
+    if (res.ok) {
+            setToast({ message: 'Password reset email sent!', type: 'success' });
+        } else {
+            setToast({ message: data.message, type: 'error' });
+        }
+     
   };
 
   return (

@@ -82,7 +82,7 @@ router.post('/forgot-password', async (req, res) => {
       auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
     });
 
-    const resetLink = `http://localhost:5173/reset-password/${token}`; // your frontend URL
+    const resetLink = `${process.env.FRONTEND_URL}/reset-password/${token}`; // your frontend URL
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to: email,

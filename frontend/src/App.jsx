@@ -1,5 +1,5 @@
 import { useState ,useEffect } from 'react';
-import Login from './pages/Login';
+import Login from './pages/login';
 import Signup from './pages/Signup';
 import Home from './Home';
 
