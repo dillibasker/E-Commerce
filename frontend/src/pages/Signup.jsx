@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 export default function Signup({ goToLogin }) {
   const [username, setUsername] = useState('');
+  const [toast, setToast] = useState(null);
   const [password, setPassword] = useState('');
   const [captcha, setCaptcha] = useState(() => {
     const a = Math.floor(Math.random() * 10);
@@ -27,15 +28,24 @@ export default function Signup({ goToLogin }) {
     const data = await res.json();
 
     if (res.ok) {
-      alert('Signup successful');
-      goToLogin();
+    setToast({ message: 'Signup successful! Redirecting to login...', type: 'success' });
+    setTimeout(goToLogin, 1800);
     } else {
-      alert(data.message);
+    setToast({ message: data.message, type: 'error' });
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-100 to-blue-100">
+
+        {toast && (
+            <Toast
+                message={toast.message}
+                type={toast.type}
+                onClose={() => setToast(null)}
+            />
+        )}
+
       <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-lg w-80">
         <h2 className="text-2xl font-bold mb-4 text-center">Sign Up</h2>
 
