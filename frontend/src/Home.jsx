@@ -4,6 +4,7 @@ import ProductGrid from './components/ProductGrid';
 import ProductDetail from './components/ProductDetail';
 import Cart from './components/Cart';
 import Checkout from './components/Checkout';
+import Profile from "./pages/Profile";
 
 function Home({ onLogout }) {
   const [products, setProducts] = useState([]);
@@ -12,6 +13,7 @@ function Home({ onLogout }) {
   const [showCart, setShowCart] = useState(false);
   const [showCheckout, setShowCheckout] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [showProfile, setShowProfile] = useState(false);
 
   useEffect(() => {
     fetchProducts();
@@ -71,51 +73,61 @@ function Home({ onLogout }) {
         cartCount={cart.reduce((sum, item) => sum + item.quantity, 0)}
         onCartClick={() => setShowCart(true)}
         onLogout={onLogout}
-
+        onProfileClick={() => setShowProfile(true)} // Profile button
       />
 
-      {loading ? (
-        <div className="flex items-center justify-center h-screen">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-600"></div>
-        </div>
-      ) : selectedProduct ? (
-        <ProductDetail
-          product={selectedProduct}
-          onClose={() => setSelectedProduct(null)}
-          onAddToCart={addToCart}
-        />
+      {/* PROFILE PAGE */}
+      {showProfile ? (
+        <Profile onBack={() => setShowProfile(false)} />
       ) : (
-        <ProductGrid
-          products={products}
-          onProductClick={setSelectedProduct}
-          onAddToCart={addToCart}
-        />
-      )}
+        <>
+          {/* LOADING */}
+          {loading ? (
+            <div className="flex items-center justify-center h-screen">
+              <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-600"></div>
+            </div>
+          ) : selectedProduct ? (
+            <ProductDetail
+              product={selectedProduct}
+              onClose={() => setSelectedProduct(null)}
+              onAddToCart={addToCart}
+            />
+          ) : (
+            <ProductGrid
+              products={products}
+              onProductClick={setSelectedProduct}
+              onAddToCart={addToCart}
+            />
+          )}
 
-      {showCart && (
-        <Cart
-          cart={cart}
-          onClose={() => setShowCart(false)}
-          onUpdateQuantity={updateQuantity}
-          onRemove={removeFromCart}
-          onCheckout={() => {
-            setShowCart(false);
-            setShowCheckout(true);
-          }}
-          total={getTotal()}
-        />
-      )}
+          {/* CART */}
+          {showCart && (
+            <Cart
+              cart={cart}
+              onClose={() => setShowCart(false)}
+              onUpdateQuantity={updateQuantity}
+              onRemove={removeFromCart}
+              onCheckout={() => {
+                setShowCart(false);
+                setShowCheckout(true);
+              }}
+              total={getTotal()}
+            />
+          )}
 
-      {showCheckout && (
-        <Checkout
-          cart={cart}
-          total={getTotal()}
-          onClose={() => setShowCheckout(false)}
-          onSuccess={() => {
-            setCart([]);
-            setShowCheckout(false);
-          }}
-        />
+          {/* CHECKOUT */}
+          {showCheckout && (
+            <Checkout
+              cart={cart}
+              total={getTotal()}
+              onClose={() => setShowCheckout(false)}
+              onSuccess={() => {
+                setCart([]);
+                setShowCheckout(false);
+              }}
+            />
+          )}
+        </>
       )}
     </div>
   );

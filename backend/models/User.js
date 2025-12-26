@@ -20,6 +20,8 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true
     },
+    sessionToken: { type: String },
+
     resetToken: { type: String },
     resetTokenExpiry: { type: Date },
   },

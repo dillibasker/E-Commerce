@@ -6,13 +6,20 @@ import productRoutes from './routes/products.js';
 import orderRoutes from './routes/orders.js';
 import Product from './models/Product.js';
 import authRoutes from './routes/auth.js';
+import cookieParser from 'cookie-parser';
 
 
 dotenv.config();
 
 const app = express();
+const allowedOrigins = ['http://localhost:5173'];
+app.use(cookieParser());
 
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true
+}));
+
 app.use(express.json());
 
 connectDB();

@@ -16,12 +16,13 @@ export default function Login({ onLogin, goToSignup }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const res = await fetch('http://localhost:5000/api/auth/login', {
+     method: 'POST',
+  credentials: 'include',
+  headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         username,
-        email,
+        
         password,
         captchaAnswer: Number(answer),
         captchaExpected: captcha.a + captcha.b
@@ -29,6 +30,7 @@ export default function Login({ onLogin, goToSignup }) {
     });
   const data = await res.json();
         if (res.ok) {
+          localStorage.setItem("isAuth", "true");
       setToast({ message: 'Login successful!', type: 'success' });
       setTimeout(onLogin, 1800);
     } else {

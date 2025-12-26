@@ -37,6 +37,38 @@ router.post('/signup', async (req, res) => {
   }
 });
 
+router.post('/logout', async (req, res) => {
+  try {
+    const token = req.cookies.sessionToken;
+    if (token) {
+      await User.updateOne({ sessionToken: token }, { $unset: { sessionToken: "" } });
+    }
+    res.clearCookie('sessionToken').json({ message: 'Logged out' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+router.get('/me', async (req, res) => {
+  try {
+    console.log("Cookies received:", req.cookies);
+
+    const token = req.cookies.sessionToken;
+      console.log("Cookies:", req.cookies); // 👈 ADD THIS
+
+    if (!token) return res.status(401).json({ message: 'Not authenticated' });
+
+    const user = await User.findOne({ sessionToken: token }).select('-password -resetToken -resetTokenExpiry');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    res.json({ user });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+
+
 /* ================= LOGIN ================= */
 router.post('/login', async (req, res) => {
   try {
@@ -57,7 +89,21 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
-    res.json({ message: 'Login successful' });
+    // Create a simple session token (could also use JWT)
+    const token = crypto.randomBytes(32).toString('hex');
+    user.sessionToken = token;
+    await user.save();
+
+    // Set token in HTTP-only cookie
+    res
+      .cookie('sessionToken', token, {
+        httpOnly: true,
+        secure: false, // set true in production with HTTPS
+        sameSite: 'lax',
+        path: '/', 
+        maxAge: 24 * 60 * 60 * 1000, // 1 day
+      })
+      .json({ message: 'Login successful' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
