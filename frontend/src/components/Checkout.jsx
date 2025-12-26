@@ -28,6 +28,7 @@ export default function Checkout({ cart, total, onClose, onSuccess }) {
     try {
       const res = await fetch(`${import.meta.env.VITE_API_URL}/orders`, {
         method: 'POST',
+        credentials: 'include', // 🔥 SEND COOKIE
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orderData)
       });

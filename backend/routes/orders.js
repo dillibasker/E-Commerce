@@ -1,11 +1,17 @@
 import express from 'express';
 import Order from '../models/Order.js';
+import authMiddleware from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-router.post('/', async (req, res) => {
+/* CREATE ORDER (LOGGED USER) */
+router.post('/', authMiddleware, async (req, res) => {
   try {
-    const order = new Order(req.body);
+    const order = new Order({
+      ...req.body,
+      user: req.user._id
+    });
+
     await order.save();
     res.status(201).json(order);
   } catch (error) {
@@ -13,9 +19,12 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.get('/', async (req, res) => {
+/* GET MY ORDERS */
+router.get('/my', authMiddleware, async (req, res) => {
   try {
-    const orders = await Order.find().sort({ createdAt: -1 });
+    const orders = await Order.find({ user: req.user._id })
+      .sort({ createdAt: -1 });
+
     res.json(orders);
   } catch (error) {
     res.status(500).json({ message: error.message });
