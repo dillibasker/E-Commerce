@@ -7,6 +7,7 @@ import orderRoutes from './routes/orders.js';
 import Product from './models/Product.js';
 import authRoutes from './routes/auth.js';
 import cookieParser from 'cookie-parser';
+import recommendRoutes from "./routes/recommend.routes.js";
 
 
 dotenv.config();
@@ -27,6 +28,7 @@ connectDB();
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/auth', authRoutes);
+app.use("/api/recommend", recommendRoutes);
 
 
 app.post('/api/seed', async (req, res) => {
