@@ -1,13 +1,29 @@
 import { X, ShoppingCart, Star } from 'lucide-react';
+import { useEffect, useState } from "react";
 
 export default function ProductDetail({ product, onClose, onAddToCart }) {
+  const [recommendations, setRecommendations] = useState([]);
+
+  useEffect(() => {
+  if (!product?._id) return;
+
+  console.log("Fetching recommendations for:", product._id);
+
+  fetch(`/api/recommend/${product._id}`)
+    .then(res => res.json())
+    .then(data => {
+      console.log("AI recommendations:", data);
+      setRecommendations(data);
+    })
+    .catch(console.error);
+}, [product]);
+
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div
         className="bg-white rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-auto shadow-2xl"
-        style={{
-          animation: 'slideIn 0.3s ease-out',
-        }}
+        style={{ animation: 'slideIn 0.3s ease-out' }}
       >
         <style>{`
           @keyframes slideIn {
@@ -23,6 +39,7 @@ export default function ProductDetail({ product, onClose, onAddToCart }) {
         `}</style>
 
         <div className="relative">
+          {/* CLOSE BUTTON */}
           <button
             onClick={onClose}
             className="absolute top-4 right-4 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100 z-10"
@@ -30,6 +47,7 @@ export default function ProductDetail({ product, onClose, onAddToCart }) {
             <X className="w-6 h-6" />
           </button>
 
+          {/* PRODUCT DETAILS */}
           <div className="grid md:grid-cols-2 gap-8 p-8">
             <div className="bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden">
               <img
@@ -44,19 +62,30 @@ export default function ProductDetail({ product, onClose, onAddToCart }) {
                 <div className="inline-block bg-blue-100 text-blue-700 px-4 py-1 rounded-full text-sm font-semibold mb-4">
                   {product.category}
                 </div>
-                <h2 className="text-3xl font-bold text-gray-800 mb-4">{product.name}</h2>
+
+                <h2 className="text-3xl font-bold text-gray-800 mb-4">
+                  {product.name}
+                </h2>
 
                 <div className="flex items-center mb-4">
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
-                      className={`w-5 h-5 ${i < Math.floor(product.rating) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`}
+                      className={`w-5 h-5 ${
+                        i < Math.floor(product.rating)
+                          ? 'text-yellow-400 fill-yellow-400'
+                          : 'text-gray-300'
+                      }`}
                     />
                   ))}
-                  <span className="ml-2 text-gray-600">{product.rating} / 5</span>
+                  <span className="ml-2 text-gray-600">
+                    {product.rating} / 5
+                  </span>
                 </div>
 
-                <p className="text-gray-600 mb-6 leading-relaxed">{product.description}</p>
+                <p className="text-gray-600 mb-6 leading-relaxed">
+                  {product.description}
+                </p>
 
                 <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
                   <p className="text-green-700 font-semibold">
@@ -69,7 +98,9 @@ export default function ProductDetail({ product, onClose, onAddToCart }) {
                 <div className="flex items-end justify-between mb-6">
                   <div>
                     <p className="text-gray-500 text-sm">Price</p>
-                    <p className="text-4xl font-bold text-blue-600">₹{product.price}</p>
+                    <p className="text-4xl font-bold text-blue-600">
+                      ₹{product.price}
+                    </p>
                   </div>
                 </div>
 
@@ -86,6 +117,52 @@ export default function ProductDetail({ product, onClose, onAddToCart }) {
               </div>
             </div>
           </div>
+
+          {/* ✅ AI RECOMMENDATIONS SECTION */}
+          {recommendations.length > 0 && (
+            <div className="px-8 pb-8">
+              <h3 className="text-2xl font-bold text-gray-800 mb-6">
+                You may also like
+              </h3>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                {recommendations.map((p) => (
+                  <div
+                    key={p._id}
+                    className="bg-white rounded-xl shadow hover:shadow-lg transition p-4"
+                  >
+                    <img
+                      src={p.image}
+                      alt={p.name}
+                      className="h-32 w-full object-cover rounded-lg"
+                    />
+
+                    <h4 className="font-semibold mt-3 truncate">
+                      {p.name}
+                    </h4>
+
+                    <div className="flex items-center mt-1">
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          className={`w-3 h-3 ${
+                            i < Math.floor(p.rating)
+                              ? "text-yellow-400 fill-yellow-400"
+                              : "text-gray-300"
+                          }`}
+                        />
+                      ))}
+                    </div>
+
+                    <p className="text-blue-600 font-bold mt-2">
+                      ₹{p.price}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
         </div>
       </div>
     </div>
