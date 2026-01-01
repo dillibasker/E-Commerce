@@ -15,28 +15,28 @@ function Home({ onLogout }) {
   const [loading, setLoading] = useState(true);
   const [showProfile, setShowProfile] = useState(false);
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
 
+
+useEffect(() => {
   const fetchProducts = async () => {
     try {
+      setLoading(true);
+      // Seed DB with 50 products
+      await fetch(`${import.meta.env.VITE_API_URL}/seed`, { method: 'POST' });
+
+      // Then fetch all products
       const res = await fetch(`${import.meta.env.VITE_API_URL}/products`);
       const data = await res.json();
-      if (data.length === 0) {
-        await fetch(`${import.meta.env.VITE_API_URL}/seed`, { method: 'POST' });
-        const res2 = await fetch(`${import.meta.env.VITE_API_URL}/products`);
-        const data2 = await res2.json();
-        setProducts(data2);
-      } else {
-        setProducts(data);
-      }
+      setProducts(data);
     } catch (error) {
       console.error('Error:', error);
     } finally {
       setLoading(false);
     }
   };
+  fetchProducts();
+}, []);
+
 
   const addToCart = (product) => {
     const existing = cart.find(item => item._id === product._id);
