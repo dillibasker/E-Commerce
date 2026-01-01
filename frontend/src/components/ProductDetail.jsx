@@ -1,7 +1,7 @@
 import { X, ShoppingCart, Star } from 'lucide-react';
 import { useEffect, useState } from "react";
 
-export default function ProductDetail({ product, onClose, onAddToCart }) {
+export default function ProductDetail({ product, onClose, onAddToCart ,onProductClick}) {
   const [recommendations, setRecommendations] = useState([]);
 
   useEffect(() => {
@@ -130,6 +130,10 @@ export default function ProductDetail({ product, onClose, onAddToCart }) {
                   <div
                     key={p._id}
                     className="bg-white rounded-xl shadow hover:shadow-lg transition p-4"
+                    onClick={() => {
+                        onProductClick(p);
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
                   >
                     <img
                       src={p.image}

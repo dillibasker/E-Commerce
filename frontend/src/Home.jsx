@@ -91,6 +91,8 @@ function Home({ onLogout }) {
               product={selectedProduct}
               onClose={() => setSelectedProduct(null)}
               onAddToCart={addToCart}
+              onProductClick={setSelectedProduct}
+
             />
           ) : (
             <ProductGrid
