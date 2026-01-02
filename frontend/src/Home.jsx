@@ -15,8 +15,6 @@ function Home({ onLogout }) {
   const [loading, setLoading] = useState(true);
   const [showProfile, setShowProfile] = useState(false);
 
-
-
 useEffect(() => {
   const fetchProducts = async () => {
     try {
@@ -36,7 +34,6 @@ useEffect(() => {
   };
   fetchProducts();
 }, []);
-
 
   const addToCart = (product) => {
     const existing = cart.find(item => item._id === product._id);
