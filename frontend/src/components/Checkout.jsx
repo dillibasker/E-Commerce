@@ -5,6 +5,7 @@ export default function Checkout({ cart, total, onClose, onSuccess }) {
   const [formData, setFormData] = useState({
     customerName: '',
     customerEmail: '',
+    customerPhone: '',
     address: ''
   });
   const [loading, setLoading] = useState(false);
@@ -86,6 +87,22 @@ export default function Checkout({ cart, total, onClose, onSuccess }) {
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
+                  <div className="mb-4">
+                  <label className="block text-gray-700 font-semibold mb-2">
+                    WhatsApp Number
+                  </label>
+                  <input
+                    type="tel"
+                    required
+                    placeholder="9876543210"
+                    value={formData.customerPhone}
+                    onChange={(e) =>
+                      setFormData({ ...formData, customerPhone: e.target.value })
+                    }
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg"
+                  />
+                </div>
+
 
               <div className="mb-6">
                 <label className="block text-gray-700 font-semibold mb-2">Address</label>

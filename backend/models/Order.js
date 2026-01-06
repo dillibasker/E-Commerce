@@ -15,6 +15,11 @@ const orderSchema = new mongoose.Schema({
   total: Number,
   customerName: String,
   customerEmail: String,
+  customerPhone: {
+  type: String,
+  required: true
+},
+
   address: String,
   status: { type: String, default: 'pending' }
 }, { timestamps: true });

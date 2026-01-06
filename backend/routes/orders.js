@@ -1,10 +1,11 @@
 import express from 'express';
 import Order from '../models/Order.js';
 import authMiddleware from '../middleware/authMiddleware.js';
+import { sendOrderEmail } from '../utils/sendOrderEmail.js';
 
 const router = express.Router();
 
-/* CREATE ORDER (LOGGED USER) */
+/* CREATE ORDER */
 router.post('/', authMiddleware, async (req, res) => {
   try {
     const order = new Order({
@@ -13,6 +14,10 @@ router.post('/', authMiddleware, async (req, res) => {
     });
 
     await order.save();
+
+    // ✅ WhatsApp notification
+    await sendOrderEmail(order);
+
     res.status(201).json(order);
   } catch (error) {
     res.status(400).json({ message: error.message });
