@@ -87,7 +87,7 @@ const user = await User.findOne({
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+      return res.status(400).json({ message: 'Invalid password' });
     }
 
     // Create a simple session token (could also use JWT)
