@@ -1,3 +1,4 @@
+import nodemailer from "nodemailer";
 export const sendOrderEmail = async (order) => {
   if (!order.items || !Array.isArray(order.items) || order.items.length === 0) {
     throw new Error("Order items are missing");
