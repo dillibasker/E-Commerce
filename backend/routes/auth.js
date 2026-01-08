@@ -71,7 +71,7 @@ router.get('/me', async (req, res) => {
 /* ================= LOGIN ================= */
 router.post('/login', async (req, res) => {
   try {
-    const { username, password, captchaAnswer, captchaExpected } = req.body;
+    const { username, captchaAnswer, captchaExpected } = req.body;
 
     // Captcha check
     if (captchaAnswer !== captchaExpected) {
@@ -85,12 +85,7 @@ const user = await User.findOne({
       return res.status(400).json({ message: 'Invalid user' });
     }
     
-    const isMatch = await bcrypt.compare(password,user.password);
-    console.log("Password original :", password ); 
-    console.log("password:database:", user.password); // Debugging line
-    if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid password' });
-    }
+
 
     // Create a simple session token (could also use JWT)
     const token = crypto.randomBytes(32).toString('hex');
