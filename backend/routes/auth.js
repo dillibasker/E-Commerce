@@ -85,7 +85,7 @@ const user = await User.findOne({
       return res.status(400).json({ message: 'Invalid user' });
     }
     
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(password,user.password);
     console.log("Password original :", password ); 
     console.log("password:database:", user.password); // Debugging line
     if (!isMatch) {
