@@ -20,7 +20,7 @@ app.use(cookieParser());
 app.use(cors({
   origin: [
     'http://localhost:5173',
-    'https://your-frontend-domain.vercel.app'
+    'https://e-commerce-steel-one.vercel.app/'
   ],
   credentials: true
 }));
