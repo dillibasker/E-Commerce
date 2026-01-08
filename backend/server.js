@@ -8,24 +8,38 @@ import Product from './models/Product.js';
 import authRoutes from './routes/auth.js';
 import cookieParser from 'cookie-parser';
 import recommendRoutes from "./routes/recommend.routes.js";
-import fetch from 'node-fetch'; // or global fetch if Node v18+
-
-
+import fetch from 'node-fetch';
 
 dotenv.config();
 
 const app = express();
-const allowedOrigins = ['http://localhost:5173'];
+
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://your-frontend-domain.vercel.app'
+];
+
 app.use(cookieParser());
 
 app.use(cors({
-  origin: 'http://localhost:5173',
-  credentials: true
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('CORS blocked'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
+app.options('*', cors());
 app.use(express.json());
 
 connectDB();
+
 app.get('/', (req, res) => {
   res.send('Backend is running!');
 });
@@ -37,30 +51,25 @@ app.use("/api/recommend", recommendRoutes);
 
 app.post('/api/seed', async (req, res) => {
   try {
-    // Clear existing products
     await Product.deleteMany();
 
-    // Fetch 50 products from DummyJSON
     const response = await fetch('https://dummyjson.com/products?limit=50');
     const data = await response.json();
+
     const products = data.products.map(p => ({
       name: p.title,
       price: p.price,
       category: p.category,
-      image: p.images[0],       // first image
+      image: p.images[0],
       description: p.description,
       rating: p.rating || 4.0,
-      stock: Math.floor(Math.random() * 50) + 10  // random stock
+      stock: Math.floor(Math.random() * 50) + 10
     }));
-    console.log('Total products from API:', data.total);
-console.log('Products received:', data.products.length);
 
-    // Insert products into DB
     await Product.insertMany(products);
 
-    res.json({ message: 'Database seeded successfully with DummyJSON products' });
+    res.json({ message: 'Database seeded successfully' });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: error.message });
   }
 });
