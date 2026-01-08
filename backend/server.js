@@ -14,22 +14,21 @@ dotenv.config();
 
 const app = express();
 
-// ✅ SIMPLE & CORRECT CORS (NO FUNCTIONS)
-app.use(cookieParser());
+
+
+import cors from "cors";
 
 app.use(cors({
   origin: [
-    'http://localhost:5173',
-    'https://e-commerce-steel-one.vercel.app/'
+    "https://e-commerce-steel-one.vercel.app"
   ],
   credentials: true
 }));
 
-// ✅ Handle preflight
-app.options('*', cors());
 
 app.use(express.json());
-
+// ✅ SIMPLE & CORRECT CORS (NO FUNCTIONS)
+app.use(cookieParser());
 // ✅ DB
 connectDB();
 
