@@ -11,10 +11,10 @@ router.post('/signup', async (req, res) => {
   try {
     const { username,email, password, captchaAnswer, captchaExpected } = req.body;
 
-    // Captcha check
-    if (captchaAnswer !== captchaExpected) {
+        if (Number(captchaAnswer) !== Number(captchaExpected)) {
       return res.status(400).json({ message: 'Captcha verification failed' });
     }
+
 
     // Check existing user
     const existingUser = await User.findOne({ username });
@@ -29,7 +29,6 @@ const user = await User.create({
   email,
   password: hashedPassword
 });
-
 
     res.status(201).json({ message: 'User registered successfully' });
   } catch (error) {
@@ -79,7 +78,9 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ message: 'Captcha verification failed' });
     }
 
-    const user = await User.findOne({ username });
+const user = await User.findOne({
+  $or: [{ username }, { email: username }]
+});
     if (!user) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
@@ -95,14 +96,14 @@ router.post('/login', async (req, res) => {
     await user.save();
 
     // Set token in HTTP-only cookie
-    res
-      .cookie('sessionToken', token, {
+        res.cookie('sessionToken', token, {
         httpOnly: true,
-        secure: false, // set true in production with HTTPS
-        sameSite: 'lax',
-        path: '/', 
-        maxAge: 24 * 60 * 60 * 1000, // 1 day
+        secure: true,        // ✅ REQUIRED on Render
+        sameSite: 'none',    // ✅ REQUIRED for cross-origin
+        path: '/',
+        maxAge: 24 * 60 * 60 * 1000
       })
+
       .json({ message: 'Login successful' });
   } catch (error) {
     res.status(500).json({ message: error.message });
