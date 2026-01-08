@@ -14,10 +14,6 @@ dotenv.config();
 
 const app = express();
 
-
-
-import cors from "cors";
-
 app.use(cors({
   origin: [
     "https://e-commerce-steel-one.vercel.app"
