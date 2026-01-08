@@ -14,41 +14,37 @@ dotenv.config();
 
 const app = express();
 
-const allowedOrigins = [
-  'http://localhost:5173',
-  'https://your-frontend-domain.vercel.app'
-];
-
+// ✅ SIMPLE & CORRECT CORS (NO FUNCTIONS)
 app.use(cookieParser());
 
 app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('CORS blocked'));
-    }
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  origin: [
+    'http://localhost:5173',
+    'https://your-frontend-domain.vercel.app'
+  ],
+  credentials: true
 }));
 
+// ✅ Handle preflight
 app.options('*', cors());
+
 app.use(express.json());
 
+// ✅ DB
 connectDB();
 
+// ✅ Health check
 app.get('/', (req, res) => {
   res.send('Backend is running!');
 });
 
+// ✅ Routes
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/auth', authRoutes);
-app.use("/api/recommend", recommendRoutes);
+app.use('/api/recommend', recommendRoutes);
 
+// ✅ Seed route
 app.post('/api/seed', async (req, res) => {
   try {
     await Product.deleteMany();
@@ -74,5 +70,6 @@ app.post('/api/seed', async (req, res) => {
   }
 });
 
+// ✅ Render port
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
