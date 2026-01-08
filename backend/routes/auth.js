@@ -82,7 +82,7 @@ const user = await User.findOne({
   $or: [{ username }, { email: username }]
 });
     if (!user) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+      return res.status(400).json({ message: 'Invalid user' });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
