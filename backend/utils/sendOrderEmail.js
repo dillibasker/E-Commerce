@@ -1,6 +1,11 @@
-import nodemailer from "nodemailer";
-
 export const sendOrderEmail = async (order) => {
+  if (!order.items || !Array.isArray(order.items) || order.items.length === 0) {
+    throw new Error("Order items are missing");
+  }
+  if (!order.customerName || !order.customerEmail || !order.address) {
+    throw new Error("Customer info is missing");
+  }
+
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {

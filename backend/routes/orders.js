@@ -8,6 +8,12 @@ const router = express.Router();
 /* CREATE ORDER */
 router.post('/', authMiddleware, async (req, res) => {
   try {
+    const { items, total, customerName, customerEmail, address } = req.body;
+
+    if (!items || items.length === 0 || !customerName || !customerEmail || !address) {
+      return res.status(400).json({ message: "Missing required order fields" });
+    }
+
     const order = new Order({
       ...req.body,
       user: req.user._id
@@ -15,14 +21,20 @@ router.post('/', authMiddleware, async (req, res) => {
 
     await order.save();
 
-    // ✅ WhatsApp notification
-    await sendOrderEmail(order);
+    try {
+      await sendOrderEmail(order);
+    } catch (emailError) {
+      console.error("Email error:", emailError.message);
+      // Email error should not block the order
+    }
 
     res.status(201).json(order);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 });
+
+
 
 /* GET MY ORDERS */
 router.get('/my', authMiddleware, async (req, res) => {
