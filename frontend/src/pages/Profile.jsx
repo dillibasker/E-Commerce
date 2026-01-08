@@ -13,7 +13,7 @@ export default function Profile({ onBack = () => {} }) {
 
   const fetchUser = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/auth/me', {
+      const res = await fetch('https://e-commerce-dzr4.onrender.com/api/auth/me', {
         credentials: 'include'
       });
 
@@ -27,7 +27,7 @@ export default function Profile({ onBack = () => {} }) {
 
   const fetchOrders = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/orders/my', {
+      const res = await fetch('https://e-commerce-dzr4.onrender.com/api/orders/my', {
         credentials: 'include'
       });
 

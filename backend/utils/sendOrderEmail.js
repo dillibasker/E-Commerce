@@ -18,7 +18,7 @@ export const sendOrderEmail = async (order) => {
   const itemsHTML = order.items.map(
     item => `<li>${item.name} × ${item.quantity} — ₹${item.price}</li>`
   ).join("");
-
+  console.log("Preparing to send order email...");
   await transporter.sendMail({
     from: `"E-Commerce" <${process.env.EMAIL_USER}>`,
     to: process.env.ADMIN_EMAIL,
