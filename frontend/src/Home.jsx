@@ -6,7 +6,7 @@ import Cart from './components/Cart';
 import Checkout from './components/Checkout';
 import Profile from "./pages/Profile";
 
-function Home({ onLogout }) {
+function Home({ onLogout, isDarkMode, toggleDarkMode }) { // ✅ ADD THESE PROPS
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -15,25 +15,25 @@ function Home({ onLogout }) {
   const [loading, setLoading] = useState(true);
   const [showProfile, setShowProfile] = useState(false);
 
-useEffect(() => {
-  const fetchProducts = async () => {
-    try {
-      setLoading(true);
-      // Seed DB with 50 products
-      await fetch(`${import.meta.env.VITE_API_URL}/seed`, { method: 'POST' });
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        // Seed DB with 50 products
+        await fetch(`${import.meta.env.VITE_API_URL}/seed`, { method: 'POST' });
 
-      // Then fetch all products
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/products`);
-      const data = await res.json();
-      setProducts(data);
-    } catch (error) {
-      console.error('Error:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-  fetchProducts();
-}, []);
+        // Then fetch all products
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/products`);
+        const data = await res.json();
+        setProducts(data);
+      } catch (error) {
+        console.error('Error:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
+  }, []);
 
   const addToCart = (product) => {
     const existing = cart.find(item => item._id === product._id);
@@ -65,23 +65,35 @@ useEffect(() => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50">
+    <div className={`min-h-screen transition-colors duration-300 ${
+      isDarkMode 
+        ? 'bg-slate-900' 
+        : 'bg-gradient-to-br from-blue-50 via-white to-orange-50'
+    }`}> {/* ✅ UPDATED - Dynamic background */}
+      
       <Header
         cartCount={cart.reduce((sum, item) => sum + item.quantity, 0)}
         onCartClick={() => setShowCart(true)}
         onLogout={onLogout}
-        onProfileClick={() => setShowProfile(true)} // Profile button
+        onProfileClick={() => setShowProfile(true)}
+        isDarkMode={isDarkMode}           // ✅ ADD THIS
+        toggleDarkMode={toggleDarkMode}   // ✅ ADD THIS
       />
 
       {/* PROFILE PAGE */}
       {showProfile ? (
-        <Profile onBack={() => setShowProfile(false)} />
+        <Profile 
+          onBack={() => setShowProfile(false)} 
+          isDarkMode={isDarkMode}  // ✅ ADD THIS
+        />
       ) : (
         <>
           {/* LOADING */}
           {loading ? (
             <div className="flex items-center justify-center h-screen">
-              <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-600"></div>
+              <div className={`animate-spin rounded-full h-16 w-16 border-t-4 ${
+                isDarkMode ? 'border-emerald-500' : 'border-blue-600'
+              }`}></div> {/* ✅ UPDATED - Dynamic spinner color */}
             </div>
           ) : selectedProduct ? (
             <ProductDetail
@@ -89,13 +101,14 @@ useEffect(() => {
               onClose={() => setSelectedProduct(null)}
               onAddToCart={addToCart}
               onProductClick={setSelectedProduct}
-
+              isDarkMode={isDarkMode}  // ✅ ADD THIS
             />
           ) : (
             <ProductGrid
               products={products}
               onProductClick={setSelectedProduct}
               onAddToCart={addToCart}
+              isDarkMode={isDarkMode}  // ✅ ADD THIS
             />
           )}
 
@@ -111,6 +124,7 @@ useEffect(() => {
                 setShowCheckout(true);
               }}
               total={getTotal()}
+              isDarkMode={isDarkMode}  // ✅ ADD THIS
             />
           )}
 
@@ -124,6 +138,7 @@ useEffect(() => {
                 setCart([]);
                 setShowCheckout(false);
               }}
+              isDarkMode={isDarkMode}  // ✅ ADD THIS
             />
           )}
         </>
