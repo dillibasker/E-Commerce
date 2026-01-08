@@ -22,14 +22,14 @@ router.post('/signup', async (req, res) => {
       return res.status(400).json({ message: 'Username already exists' });
     }
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
+const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = await User.create({
-      username,
-      email,
-      password
-    });
+const user = await User.create({
+  username,
+  email,
+  password: hashedPassword
+});
+
 
     res.status(201).json({ message: 'User registered successfully' });
   } catch (error) {
@@ -150,7 +150,7 @@ router.post('/reset-password/:token', async (req, res) => {
     const user = await User.findOne({ resetToken: token, resetTokenExpiry: { $gt: Date.now() } });
     if (!user) return res.status(400).json({ message: 'Invalid or expired token' });
 
-    user.password = password; // You can hash it using bcrypt
+    user.password = await bcrypt.hash(password, 10);
     user.resetToken = undefined;
     user.resetTokenExpiry = undefined;
     await user.save();
