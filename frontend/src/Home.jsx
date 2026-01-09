@@ -5,6 +5,7 @@ import ProductDetail from './components/ProductDetail';
 import Cart from './components/Cart';
 import Checkout from './components/Checkout';
 import Profile from "./pages/Profile";
+import Wishlist from "./pages/Wishlist";
 
 function Home({ onLogout, isDarkMode, toggleDarkMode }) { // ✅ ADD THESE PROPS
   const [products, setProducts] = useState([]);
@@ -14,6 +15,8 @@ function Home({ onLogout, isDarkMode, toggleDarkMode }) { // ✅ ADD THESE PROPS
   const [showCheckout, setShowCheckout] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showProfile, setShowProfile] = useState(false);
+  const [showWishlist, setShowWishlist] = useState(false);
+
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -76,17 +79,23 @@ function Home({ onLogout, isDarkMode, toggleDarkMode }) { // ✅ ADD THESE PROPS
         onCartClick={() => setShowCart(true)}
         onLogout={onLogout}
         onProfileClick={() => setShowProfile(true)}
+        WhishlistClick={() => setShowWishlist(true)}
         isDarkMode={isDarkMode}           // ✅ ADD THIS
         toggleDarkMode={toggleDarkMode}   // ✅ ADD THIS
       />
 
       {/* PROFILE PAGE */}
-      {showProfile ? (
-        <Profile 
-          onBack={() => setShowProfile(false)} 
-          isDarkMode={isDarkMode}  // ✅ ADD THIS
-        />
-      ) : (
+      {showWishlist ? (
+            <Wishlist
+              onBack={() => setShowWishlist(false)}
+              isDarkMode={isDarkMode}
+            />
+          ) : showProfile ? (
+            <Profile
+              onBack={() => setShowProfile(false)}
+              isDarkMode={isDarkMode}
+            />
+          ) : (
         <>
           {/* LOADING */}
           {loading ? (
@@ -146,5 +155,6 @@ function Home({ onLogout, isDarkMode, toggleDarkMode }) { // ✅ ADD THESE PROPS
     </div>
   );
 }
+
 
 export default Home;

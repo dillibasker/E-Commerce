@@ -6,6 +6,7 @@ import productRoutes from './routes/products.js';
 import orderRoutes from './routes/orders.js';
 import Product from './models/Product.js';
 import authRoutes from './routes/auth.js';
+import wishlistRoutes from "./routes/wishlist.routes.js";
 import cookieParser from 'cookie-parser';
 import recommendRoutes from "./routes/recommend.routes.js";
 import fetch from 'node-fetch';
@@ -37,6 +38,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/recommend', recommendRoutes);
+app.use("/api/wishlist", wishlistRoutes);
 
 // ✅ Seed route
 app.post('/api/seed', async (req, res) => {

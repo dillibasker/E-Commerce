@@ -24,6 +24,20 @@ export default function ProductDetail({ product, onClose, onAddToCart, onProduct
       .catch(console.error);
   }, [product]);
 
+  const toggleWishlist = async () => {
+    const res = await fetch("/api/wishlist/toggle", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userId,
+        productId: product._id
+      })
+    });
+
+    const data = await res.json();
+    setIsWishlisted(data.wishlisted);
+  };
+
   const handleAddToCart = () => {
     for (let i = 0; i < quantity; i++) {
       onAddToCart(product);
@@ -106,17 +120,17 @@ export default function ProductDetail({ product, onClose, onAddToCart, onProduct
                 {/* Action Buttons Overlay */}
                 <div className="absolute top-4 right-4 flex space-x-2">
                   <button
-                    onClick={() => setIsWishlisted(!isWishlisted)}
-                    className={`p-3 rounded-full backdrop-blur-md shadow-lg transition-all ${
-                      isWishlisted
-                        ? 'bg-red-500 text-white scale-110'
-                        : isDarkMode
-                          ? 'bg-slate-800/80 hover:bg-red-500 text-white'
-                          : 'bg-white/90 hover:bg-red-500 hover:text-white text-gray-800'
-                    }`}
-                  >
-                    <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-white' : ''}`} />
-                  </button>
+                          onClick={toggleWishlist}
+                          className={`p-3 rounded-full backdrop-blur-md shadow-lg transition-all ${
+                            isWishlisted
+                              ? 'bg-red-500 text-white scale-110'
+                              : isDarkMode
+                                ? 'bg-slate-800/80 hover:bg-red-500 text-white'
+                                : 'bg-white/90 hover:bg-red-500 hover:text-white text-gray-800'
+                          }`}
+                        >
+                          <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-white' : ''}`} />
+                    </button>
                   <button className={`p-3 rounded-full backdrop-blur-md shadow-lg transition-all ${
                     isDarkMode
                       ? 'bg-slate-800/80 hover:bg-emerald-500 text-white'

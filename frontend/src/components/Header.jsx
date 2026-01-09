@@ -6,10 +6,17 @@ export default function Header({
   onCartClick,
   onLogout,
   onProfileClick,
-          // ✅ ADD THIS
+  WhishlistClick,
   toggleDarkMode
 
 }) {
+
+  useEffect(() => {
+  fetch(`/api/wishlist/count/${userId}`)
+    .then(res => res.json())
+    .then(data => setWishlistCount(data.count));
+}, []);
+
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [notifications, setNotifications] = useState(3);
@@ -82,14 +89,20 @@ export default function Header({
               </button>
 
               {/* Wishlist */}
-              <button className={`hidden md:block relative p-3 rounded-full transition-all duration-300 ${isDarkMode ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-900'} hover:scale-110`}>
-                <Heart className="w-5 h-5" />
-                {wishlistCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-gradient-to-r from-rose-500 to-pink-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
-                    {wishlistCount}
-                  </span>
-                )}
+              <button
+                  onClick={WhishlistClick}
+                  className={`hidden md:block relative p-3 rounded-full transition-all duration-300 ${
+                    isDarkMode ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-900'
+                  } hover:scale-110`}
+                >
+                  <Heart className="w-5 h-5" />
+                  {wishlistCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-gradient-to-r from-rose-500 to-pink-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+                      {wishlistCount}
+                    </span>
+                  )}
               </button>
+
 
               {/* Notifications */}
               <button className={`hidden md:block relative p-3 rounded-full transition-all duration-300 ${isDarkMode ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-900'} hover:scale-110`}>
