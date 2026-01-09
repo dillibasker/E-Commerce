@@ -129,8 +129,7 @@ export default function Header({
             {/* RIGHT SECTION */}
             <div className="flex items-center space-x-3">
 
-              {/* Theme Toggle */}
-              // In your Header component, update the dark mode button:
+
 
 <button
   onClick={toggleDarkMode}  // ✅ CHANGE THIS - was setIsDarkMode
