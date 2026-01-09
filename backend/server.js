@@ -21,7 +21,6 @@ app.use(cors({
   credentials: true
 }));
 
-
 app.use(express.json());
 // ✅ SIMPLE & CORRECT CORS (NO FUNCTIONS)
 app.use(cookieParser());
