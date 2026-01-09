@@ -68,46 +68,6 @@ export default function Header({
                   ShopZone
                 </h1>
               </div>
-
-              {/* Category Mega Menu */}
-              <div className="hidden lg:block relative">
-                <button
-                  onMouseEnter={() => setShowCategoryMenu(true)}
-                  onMouseLeave={() => setShowCategoryMenu(false)}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-semibold transition-all ${isDarkMode ? 'bg-slate-800 text-white hover:bg-slate-700' : 'bg-slate-100 text-slate-900 hover:bg-slate-200'}`}
-                >
-                  <Menu className="w-5 h-5" />
-                  <span>Categories</span>
-                  <ChevronDown className="w-4 h-4" />
-                </button>
-
-                {showCategoryMenu && (
-                  <div
-                    onMouseEnter={() => setShowCategoryMenu(true)}
-                    onMouseLeave={() => setShowCategoryMenu(false)}
-                    className={`absolute top-full left-0 mt-2 w-64 rounded-xl shadow-2xl ${isDarkMode ? 'bg-slate-800' : 'bg-white'} border ${isDarkMode ? 'border-slate-700' : 'border-slate-200'} overflow-hidden`}
-                  >
-                    {categories.map((cat, idx) => (
-                      <a
-                        key={idx}
-                        href="#"
-                        className={`flex items-center justify-between px-4 py-3 transition ${isDarkMode ? 'hover:bg-slate-700' : 'hover:bg-slate-50'}`}
-                      >
-                        <div className="flex items-center space-x-3">
-                          <span className="text-2xl">{cat.icon}</span>
-                          <span className={`font-medium ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{cat.name}</span>
-                        </div>
-                        {cat.trending && (
-                          <span className="flex items-center text-xs bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-2 py-1 rounded-full">
-                            <TrendingUp className="w-3 h-3 mr-1" />
-                            Hot
-                          </span>
-                        )}
-                      </a>
-                    ))}
-                  </div>
-                )}
-              </div>
             </div>
             
             {/* RIGHT SECTION */}
