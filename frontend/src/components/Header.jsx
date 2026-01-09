@@ -72,9 +72,6 @@ export default function Header({
             
             {/* RIGHT SECTION */}
             <div className="flex items-center space-x-3">
-
-
-
               <button
                 onClick={toggleDarkMode}  // ✅ CHANGE THIS - was setIsDarkMode
                 className={`p-3 rounded-full transition-all duration-300 ${
