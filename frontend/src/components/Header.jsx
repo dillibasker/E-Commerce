@@ -109,36 +109,20 @@ export default function Header({
                 )}
               </div>
             </div>
-
-            {/* CENTER - Search Bar */}
-            <div className="hidden md:flex flex-1 max-w-2xl mx-8">
-              <div className={`flex items-center w-full rounded-full transition-all duration-300 ${isSearchExpanded ? 'ring-2 ring-emerald-500' : ''} ${isDarkMode ? 'bg-slate-800' : 'bg-slate-100'}`}>
-                <input
-                  type="text"
-                  placeholder="Search for products, brands, and more..."
-                  onFocus={() => setIsSearchExpanded(true)}
-                  onBlur={() => setIsSearchExpanded(false)}
-                  className={`flex-1 px-6 py-3 rounded-l-full outline-none font-medium ${isDarkMode ? 'bg-slate-800 text-white placeholder-slate-400' : 'bg-slate-100 text-slate-900 placeholder-slate-500'}`}
-                />
-                <button className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white px-6 py-3 rounded-r-full transition-all duration-300 transform hover:scale-105">
-                  <Search className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-
+            
             {/* RIGHT SECTION */}
             <div className="flex items-center space-x-3">
 
 
 
-<button
-  onClick={toggleDarkMode}  // ✅ CHANGE THIS - was setIsDarkMode
-  className={`p-3 rounded-full transition-all duration-300 ${
-    isDarkMode ? 'bg-slate-800 text-yellow-400' : 'bg-slate-100 text-slate-600'
-  } hover:scale-110`}
->
-  {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-</button>
+              <button
+                onClick={toggleDarkMode}  // ✅ CHANGE THIS - was setIsDarkMode
+                className={`p-3 rounded-full transition-all duration-300 ${
+                  isDarkMode ? 'bg-slate-800 text-yellow-400' : 'bg-slate-100 text-slate-600'
+                } hover:scale-110`}
+              >
+                {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              </button>
 
               {/* Wishlist */}
               <button className={`hidden md:block relative p-3 rounded-full transition-all duration-300 ${isDarkMode ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-900'} hover:scale-110`}>
