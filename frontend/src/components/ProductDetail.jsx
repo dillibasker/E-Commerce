@@ -15,7 +15,7 @@ export default function ProductDetail({ product, onClose, onAddToCart, onProduct
 
     console.log("Fetching recommendations for:", product._id);
 
-    fetch(`${process.env.REACT_APP_BACKEND_URL}/recommend/${product._id}`)
+    fetch(`${import.meta.env.VITE_API_URL}/recommend/${product._id}`)
       .then(res => res.json())
       .then(data => {
         console.log("AI recommendations:", data);
