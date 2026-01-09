@@ -17,7 +17,7 @@ export default function Toast({ message, type = 'success', onClose, duration = 3
     // Auto close timer
     const timer = setTimeout(() => {
       setIsVisible(false);
-      setTimeout(onClose, 100); // Wait for fade out animation
+      setTimeout(onClose, 300); // Wait for fade out animation
     }, duration);
 
     return () => {
@@ -28,7 +28,7 @@ export default function Toast({ message, type = 'success', onClose, duration = 3
 
   const handleClose = () => {
     setIsVisible(false);
-    setTimeout(onClose, 100);
+    setTimeout(onClose, 300);
   };
 
   const getTypeConfig = () => {
