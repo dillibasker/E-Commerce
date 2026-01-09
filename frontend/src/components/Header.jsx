@@ -21,7 +21,6 @@ export default function Header({
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [notifications, setNotifications] = useState(3);
-  const [wishlistCount, setWishlistCount] = useState(5);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showCategoryMenu, setShowCategoryMenu] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
