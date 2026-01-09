@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState , useEffect } from 'react';
 import { ShoppingCart, Search, Menu, LogOut, User, Bell, Heart, Sun, Moon, Globe, ChevronDown, Gift, TrendingUp, X } from 'lucide-react';
 
 export default function Header({
