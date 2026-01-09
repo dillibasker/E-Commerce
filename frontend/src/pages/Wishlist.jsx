@@ -1,13 +1,34 @@
 import { useEffect, useState } from "react";
-import ProductCard from "../components/ProductCard";
+import ProductGrid from "../components/ProductGrid";
 
 export default function Wishlist({ onBack, isDarkMode }) {
-  const [wishlist, setWishlist] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}/wishlist/USER_ID`)
-      .then(res => res.json())
-      .then(setWishlist);
+    const fetchWishlist = async () => {
+      try {
+        const userId = localStorage.getItem("userId");
+        if (!userId) return;
+
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL}/wishlist/${userId}`
+        );
+
+        const data = await res.json();
+
+        // 🔥 Extract products from wishlist docs
+        const wishlistProducts = data.map(item => item.productId);
+
+        setProducts(wishlistProducts);
+      } catch (err) {
+        console.error("Wishlist fetch error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchWishlist();
   }, []);
 
   return (
@@ -23,18 +44,17 @@ export default function Wishlist({ onBack, isDarkMode }) {
         My Wishlist ❤️
       </h2>
 
-      {wishlist.length === 0 ? (
+      {loading ? (
+        <p className="text-gray-400">Loading wishlist...</p>
+      ) : products.length === 0 ? (
         <p className="text-gray-500">No wishlist items</p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {wishlist.map(item => (
-            <ProductCard
-              key={item._id}
-              product={item.productId}
-              isDarkMode={isDarkMode}
-            />
-          ))}
-        </div>
+        <ProductGrid
+          products={products}
+          isDarkMode={isDarkMode}
+          onProductClick={() => {}}
+          onAddToCart={() => {}}
+        />
       )}
     </div>
   );

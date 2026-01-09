@@ -6,6 +6,7 @@ export default function Header({
   onCartClick,
   onLogout,
   onProfileClick,
+  wishlistCount,
   WhishlistClick,
   toggleDarkMode
 

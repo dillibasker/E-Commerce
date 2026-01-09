@@ -16,6 +16,7 @@ function Home({ onLogout, isDarkMode, toggleDarkMode }) { // ✅ ADD THESE PROPS
   const [loading, setLoading] = useState(true);
   const [showProfile, setShowProfile] = useState(false);
   const [showWishlist, setShowWishlist] = useState(false);
+  const [wishlist, setWishlist] = useState([]);
 
 
   useEffect(() => {
@@ -37,6 +38,26 @@ function Home({ onLogout, isDarkMode, toggleDarkMode }) { // ✅ ADD THESE PROPS
     };
     fetchProducts();
   }, []);
+  useEffect(() => {
+  const fetchWishlist = async () => {
+    try {
+      const userId = localStorage.getItem("userId");
+      if (!userId) return;
+
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/wishlist/${userId}`
+      );
+
+      const data = await res.json();
+      setWishlist(data);
+    } catch (err) {
+      console.error("Failed to load wishlist", err);
+    }
+  };
+
+  fetchWishlist();
+}, []);
+
 
   const addToCart = (product) => {
     const existing = cart.find(item => item._id === product._id);
@@ -80,6 +101,7 @@ function Home({ onLogout, isDarkMode, toggleDarkMode }) { // ✅ ADD THESE PROPS
         onLogout={onLogout}
         onProfileClick={() => setShowProfile(true)}
         WhishlistClick={() => setShowWishlist(true)}
+        wishlistCount={wishlist.length}
         isDarkMode={isDarkMode}           // ✅ ADD THIS
         toggleDarkMode={toggleDarkMode}   // ✅ ADD THIS
       />

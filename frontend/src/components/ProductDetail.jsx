@@ -10,33 +10,48 @@ export default function ProductDetail({ product, onClose, onAddToCart, onProduct
   // Mock multiple images for gallery (in real app, get from product)
   const images = [product.image, product.image, product.image, product.image];
 
-  useEffect(() => {
-    if (!product?._id) return;
+useEffect(() => {
+  const checkWishlist = async () => {
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/wishlist/${localStorage.getItem("userId")}`
+      );
+      const data = await res.json();
 
-    console.log("Fetching recommendations for:", product._id);
+      setIsWishlisted(
+        data.some(item => item.productId._id === product._id)
+      );
+    } catch (err) {
+      console.error("Wishlist check failed", err);
+    }
+  };
 
-    fetch(`${import.meta.env.VITE_API_URL}/recommend/${product._id}`)
-      .then(res => res.json())
-      .then(data => {
-        console.log("AI recommendations:", data);
-        setRecommendations(data);
-      })
-      .catch(console.error);
-  }, [product]);
+  if (product?._id) {
+    checkWishlist();
+  }
+}, [product]);
 
-  const toggleWishlist = async () => {
-    const res = await fetch("/api/wishlist/toggle", {
+
+const toggleWishlist = async () => {
+  try {
+    // optimistic UI
+    setIsWishlisted(prev => !prev);
+
+    await fetch(`${import.meta.env.VITE_API_URL}/wishlist/toggle`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        userId,
+        userId: localStorage.getItem("userId"),
         productId: product._id
       })
     });
+  } catch (err) {
+    console.error("Wishlist toggle failed", err);
+    // rollback UI if API fails
+    setIsWishlisted(prev => !prev);
+  }
+};
 
-    const data = await res.json();
-    setIsWishlisted(data.wishlisted);
-  };
 
   const handleAddToCart = () => {
     for (let i = 0; i < quantity; i++) {

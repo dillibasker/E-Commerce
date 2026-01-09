@@ -43,29 +43,66 @@ export default function ProductGrid({ products = [], onProductClick, onAddToCart
     }
 
     // Update suggestions
-    useEffect(() => {
-        if (!searchTerm || !products || products.length === 0) {
-            setSuggestions([]);
-            return;
-        }
+/* 🔍 Search suggestions */
+useEffect(() => {
+  if (!searchTerm || !products || products.length === 0) {
+    setSuggestions([]);
+    return;
+  }
 
-        const matches = products
-            .filter(p =>
-                p.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                p.category?.toLowerCase().includes(searchTerm.toLowerCase())
-            )
-            .slice(0, 5);
+  const matches = products
+    .filter(p =>
+      p.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.category?.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .slice(0, 5);
 
-        setSuggestions(matches);
-    }, [searchTerm, products]);
+  setSuggestions(matches);
+}, [searchTerm, products]);
 
-    const toggleWishlist = (productId) => {
-        setWishlist(prev =>
-            prev.includes(productId)
-                ? prev.filter(id => id !== productId)
-                : [...prev, productId]
-        );
-    };
+/* ❤️ Fetch wishlist from MongoDB */
+useEffect(() => {
+  const fetchWishlist = async () => {
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/wishlist/${localStorage.getItem("userId")}`
+      );
+
+      const data = await res.json();
+
+      // convert DB data → productId array
+      setWishlist(data.map(item => item.productId._id));
+    } catch (error) {
+      console.error("Failed to fetch wishlist", error);
+    }
+  };
+
+  fetchWishlist();
+}, []);
+
+
+const toggleWishlist = async (productId) => {
+  try {
+    // optimistic UI (instant response)
+    setWishlist(prev =>
+      prev.includes(productId)
+        ? prev.filter(id => id !== productId)
+        : [...prev, productId]
+    );
+
+    await fetch(`${import.meta.env.VITE_API_URL}/wishlist/toggle`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userId: localStorage.getItem("userId"),
+        productId
+      })
+    });
+  } catch (err) {
+    console.error("Wishlist failed", err);
+  }
+};
+
 
     return (
         <div className={`min-h-screen transition-colors duration-300 ${isDarkMode ? 'bg-slate-900' : 'bg-slate-50'}`}>
