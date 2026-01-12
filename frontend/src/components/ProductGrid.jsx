@@ -6,7 +6,6 @@ export default function ProductGrid({ products = [],  wishlist = [],
     const [searchTerm, setSearchTerm] = useState("");
     const [suggestions, setSuggestions] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState("All");
-    const [wishlist, setWishlist] = useState([]);
     const [priceRange, setPriceRange] = useState("All");
     const [sortBy, setSortBy] = useState("featured");
 
