@@ -91,15 +91,14 @@ const user = await User.findOne({
     const token = crypto.randomBytes(32).toString('hex');
     user.sessionToken = token;
     await user.save();
-
-    // Set token in HTTP-only cookie
-        res.cookie('sessionToken', token, {
+      res.cookie('sessionToken', token, {
         httpOnly: true,
-        secure: true,        // ✅ REQUIRED on Render
-        sameSite: 'none',    // ✅ REQUIRED for cross-origin
+        secure: process.env.NODE_ENV === 'production', // ✅ only true in production
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
         path: '/',
-        maxAge: 24 * 60 * 60 * 1000
+        maxAge: 24 * 60 * 60 * 1000 // 1 day
       })
+
 
       .json({ message: 'Login successful' });
   } catch (error) {
