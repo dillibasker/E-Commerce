@@ -26,7 +26,7 @@ useEffect(() => {
       setLoading(true);
 
       // 1️⃣ Fetch logged-in user
-      const userRes = await fetch(`${import.meta.env.VITE_API_URL}/me`, {
+      const userRes = await fetch(`${import.meta.env.VITE_API_URL}/auth/me`, {
         credentials: "include", // send cookies
       });
       if (!userRes.ok) throw new Error("Not authenticated");

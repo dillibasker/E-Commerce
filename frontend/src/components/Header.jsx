@@ -13,11 +13,15 @@ export default function Header({
 
 }) {
 
-  useEffect(() => {
-  fetch(`/api/wishlist/count/${userId}`)
+useEffect(() => {
+  if (!userId) return;   // ✅ ADD THIS
+
+  fetch(`${import.meta.env.VITE_API_URL}/wishlist/count/${userId}`)
     .then(res => res.json())
-    .then(data => setWishlistCount(data.count));
-}, []);
+    .then(data => setWishlistCount(data.count))
+    .catch(err => console.error(err));
+}, [userId]);
+
 
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
