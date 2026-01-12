@@ -19,6 +19,24 @@ export default function ProductDetail({ product, onClose, onAddToCart, onProduct
     onClose();
   };
 
+  const shareProduct = async (product) => {
+  const url = `${window.location.origin}/product/${product._id}`;
+
+  if (navigator.share) {
+    // ✅ Same native share popup as Amazon / Flipkart
+    await navigator.share({
+      title: product.name,
+      text: `Check out this product on our store`,
+      url,
+    });
+  } else {
+    // 🖥 Desktop fallback
+    await navigator.clipboard.writeText(url);
+    alert("Link copied to clipboard");
+  }
+};
+
+
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
       <div
@@ -106,13 +124,17 @@ export default function ProductDetail({ product, onClose, onAddToCart, onProduct
                         <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-white' : ''}`} />
                       </button>
 
-                  <button className={`p-3 rounded-full backdrop-blur-md shadow-lg transition-all ${
-                    isDarkMode
-                      ? 'bg-slate-800/80 hover:bg-emerald-500 text-white'
-                      : 'bg-white/90 hover:bg-emerald-500 hover:text-white text-gray-800'
-                  }`}>
+                  <button
+                    onClick={() => shareProduct(product)}
+                    className={`p-3 rounded-full backdrop-blur-md shadow-lg transition-all ${
+                      isDarkMode
+                        ? 'bg-slate-800/80 hover:bg-emerald-500 text-white'
+                        : 'bg-white/90 hover:bg-emerald-500 hover:text-white text-gray-800'
+                    }`}
+                  >
                     <Share2 className="w-5 h-5" />
                   </button>
+
                 </div>
 
                 {/* Stock Badge */}

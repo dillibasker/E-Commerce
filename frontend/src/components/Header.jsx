@@ -22,7 +22,6 @@ useEffect(() => {
     .catch(err => console.error(err));
 }, [userId]);
 
-
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [notifications, setNotifications] = useState(3);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
