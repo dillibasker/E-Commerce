@@ -7,7 +7,8 @@ export default function Header({
   onLogout,
   onProfileClick,
   wishlistCount,
-  WhishlistClick,
+  userId,
+  WishlistClick,
   toggleDarkMode
 
 }) {
@@ -24,7 +25,6 @@ export default function Header({
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showCategoryMenu, setShowCategoryMenu] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-
 
   const categories = [
     { name: 'Electronics', icon: '💻', trending: true },
@@ -90,7 +90,7 @@ export default function Header({
 
               {/* Wishlist */}
               <button
-                  onClick={WhishlistClick}
+                  onClick={WishlistClick}
                   className={`hidden md:block relative p-3 rounded-full transition-all duration-300 ${
                     isDarkMode ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-900'
                   } hover:scale-110`}

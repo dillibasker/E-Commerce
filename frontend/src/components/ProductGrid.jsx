@@ -1,7 +1,8 @@
 import { ShoppingCart, Star, Heart, Eye, TrendingUp, Zap, Filter, X, Sparkles } from 'lucide-react';
 import { useState, useEffect } from "react";
 
-export default function ProductGrid({ products = [], onProductClick, onAddToCart, isDarkMode }) {
+export default function ProductGrid({ products = [],  wishlist = [],
+  onToggleWishlist, onProductClick, onAddToCart, isDarkMode }) {
     const [searchTerm, setSearchTerm] = useState("");
     const [suggestions, setSuggestions] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState("All");
@@ -59,50 +60,6 @@ useEffect(() => {
 
   setSuggestions(matches);
 }, [searchTerm, products]);
-
-/* ❤️ Fetch wishlist from MongoDB */
-useEffect(() => {
-  const fetchWishlist = async () => {
-    try {
-      const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/wishlist/${localStorage.getItem("userId")}`
-      );
-
-      const data = await res.json();
-
-      // convert DB data → productId array
-      setWishlist(data.map(item => item.productId._id));
-    } catch (error) {
-      console.error("Failed to fetch wishlist", error);
-    }
-  };
-
-  fetchWishlist();
-}, []);
-
-
-const toggleWishlist = async (productId) => {
-  try {
-    // optimistic UI (instant response)
-    setWishlist(prev =>
-      prev.includes(productId)
-        ? prev.filter(id => id !== productId)
-        : [...prev, productId]
-    );
-
-    await fetch(`${import.meta.env.VITE_API_URL}/wishlist/toggle`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        userId: localStorage.getItem("userId"),
-        productId
-      })
-    });
-  } catch (err) {
-    console.error("Wishlist failed", err);
-  }
-};
-
 
     return (
         <div className={`min-h-screen transition-colors duration-300 ${isDarkMode ? 'bg-slate-900' : 'bg-slate-50'}`}>
@@ -283,21 +240,25 @@ const toggleWishlist = async (productId) => {
 
                                 {/* Action Buttons */}
                                 <div className="absolute top-3 right-3 flex flex-col space-y-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            toggleWishlist(product._id);
-                                        }}
-                                        className={`p-2.5 rounded-full backdrop-blur-md transition-all duration-300 shadow-lg ${
-                                            wishlist.includes(product._id)
-                                                ? 'bg-red-500 text-white scale-110'
-                                                : isDarkMode
+                                      <button
+                                                onClick={(e) => {
+                                                e.stopPropagation();
+                                                onToggleWishlist(product._id); // ✅ FIXED
+                                                }}
+                                                className={`p-2.5 rounded-full backdrop-blur-md transition-all duration-300 shadow-lg ${
+                                                wishlist.includes(product._id)
+                                                    ? 'bg-red-500 text-white scale-110'
+                                                    : isDarkMode
                                                     ? 'bg-slate-800/90 text-white hover:bg-red-500'
                                                     : 'bg-white/90 text-slate-700 hover:bg-red-500 hover:text-white'
-                                        }`}
-                                    >
-                                        <Heart className={`w-5 h-5 ${wishlist.includes(product._id) ? 'fill-white' : ''}`} />
-                                    </button>
+                                                }`}
+                                            >
+                                                <Heart
+                                                className={`w-5 h-5 ${
+                                                    wishlist.includes(product._id) ? 'fill-white' : ''
+                                                }`}
+                                                />
+                                        </button>
                                     <button className={`p-2.5 rounded-full backdrop-blur-md transition-all duration-300 shadow-lg ${
                                         isDarkMode
                                             ? 'bg-slate-800/90 text-white hover:bg-emerald-500'

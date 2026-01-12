@@ -17,47 +17,51 @@ function Home({ onLogout, isDarkMode, toggleDarkMode }) { // ✅ ADD THESE PROPS
   const [showProfile, setShowProfile] = useState(false);
   const [showWishlist, setShowWishlist] = useState(false);
   const [wishlist, setWishlist] = useState([]);
+    const [currentUser, setCurrentUser] = useState(null); // ✅ FIX
+  const [userId, setUserId] = useState(null);
 
-
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        setLoading(true);
-        // Seed DB with 50 products
-        await fetch(`${import.meta.env.VITE_API_URL}/seed`, { method: 'POST' });
-
-        // Then fetch all products
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/products`);
-        const data = await res.json();
-        setProducts(data);
-      } catch (error) {
-        console.error('Error:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProducts();
-  }, []);
-  useEffect(() => {
-  const fetchWishlist = async () => {
+useEffect(() => {
+  const fetchData = async () => {
     try {
-      const userId = localStorage.getItem("userId");
-      if (!userId) return;
+      setLoading(true);
 
-      const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/wishlist/${userId}`
-      );
+      // 1️⃣ Fetch logged-in user
+      const userRes = await fetch(`${import.meta.env.VITE_API_URL}/me`, {
+        credentials: "include", // send cookies
+      });
+      if (!userRes.ok) throw new Error("Not authenticated");
+      const userData = await userRes.json();
+      setCurrentUser(userData.user); // ✅ store user info
 
-      const data = await res.json();
-      setWishlist(data);
+      const userId = userData.user._id;
+      setUserId(userId);
+
+      // 2️⃣ Seed DB with products (optional)
+      if (import.meta.env.DEV) {
+      await fetch(`${import.meta.env.VITE_API_URL}/seed`, { method: "POST" });
+      }
+
+
+      // 3️⃣ Fetch all products
+      const productRes = await fetch(`${import.meta.env.VITE_API_URL}/products`);
+      const productsData = await productRes.json();
+      setProducts(productsData);
+
+      // 4️⃣ Fetch wishlist for current user
+      const wishlistRes = await fetch(`${import.meta.env.VITE_API_URL}/wishlist/${userId}`);
+      const wishlistData = await wishlistRes.json();
+      setWishlist(wishlistData.map(item => item.productId._id));
+
+
     } catch (err) {
-      console.error("Failed to load wishlist", err);
+      console.error("Error loading data:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
-  fetchWishlist();
+  fetchData();
 }, []);
-
 
   const addToCart = (product) => {
     const existing = cart.find(item => item._id === product._id);
@@ -83,6 +87,24 @@ function Home({ onLogout, isDarkMode, toggleDarkMode }) { // ✅ ADD THESE PROPS
       ));
     }
   };
+  const toggleWishlist = async (productId) => {
+  try {
+    setWishlist(prev =>
+      prev.includes(productId)
+        ? prev.filter(id => id !== productId)
+        : [...prev, productId]
+    );
+
+    await fetch(`${import.meta.env.VITE_API_URL}/wishlist/toggle`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ productId })
+    });
+  } catch (err) {
+    console.error(err);
+  }
+};
 
   const getTotal = () => {
     return cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -102,6 +124,7 @@ function Home({ onLogout, isDarkMode, toggleDarkMode }) { // ✅ ADD THESE PROPS
         onProfileClick={() => setShowProfile(true)}
         WhishlistClick={() => setShowWishlist(true)}
         wishlistCount={wishlist.length}
+        userId={userId}
         isDarkMode={isDarkMode}           // ✅ ADD THIS
         toggleDarkMode={toggleDarkMode}   // ✅ ADD THIS
       />
@@ -109,8 +132,13 @@ function Home({ onLogout, isDarkMode, toggleDarkMode }) { // ✅ ADD THESE PROPS
       {/* PROFILE PAGE */}
       {showWishlist ? (
             <Wishlist
-              onBack={() => setShowWishlist(false)}
-              isDarkMode={isDarkMode}
+                onBack={() => setShowWishlist(false)}
+                isDarkMode={isDarkMode}
+                wishlist={wishlist}
+                allProducts={products}
+                onToggleWishlist={toggleWishlist}
+                onAddToCart={addToCart}
+                onProductClick={setSelectedProduct}
             />
           ) : showProfile ? (
             <Profile
@@ -129,17 +157,23 @@ function Home({ onLogout, isDarkMode, toggleDarkMode }) { // ✅ ADD THESE PROPS
           ) : selectedProduct ? (
             <ProductDetail
               product={selectedProduct}
+              wishlist={wishlist}
+              onToggleWishlist={toggleWishlist}
               onClose={() => setSelectedProduct(null)}
               onAddToCart={addToCart}
               onProductClick={setSelectedProduct}
-              isDarkMode={isDarkMode}  // ✅ ADD THIS
+              isDarkMode={isDarkMode}
+                // ✅ ADD THIS
             />
           ) : (
             <ProductGrid
               products={products}
+              wishlist={wishlist}
+              onToggleWishlist={toggleWishlist}
               onProductClick={setSelectedProduct}
               onAddToCart={addToCart}
-              isDarkMode={isDarkMode}  // ✅ ADD THIS
+              isDarkMode={isDarkMode} 
+              currentUser={currentUser} // ✅ ADD THIS
             />
           )}
 

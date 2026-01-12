@@ -1,56 +1,15 @@
 import { X, ShoppingCart, Star, Heart, Share2, TrendingUp, Package, Shield, Truck, RotateCcw, Zap, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useEffect, useState } from "react";
 
-export default function ProductDetail({ product, onClose, onAddToCart, onProductClick, isDarkMode }) {
+export default function ProductDetail({ product, onClose, onAddToCart, onProductClick, isDarkMode ,  wishlist,          // ✅ ADD
+  onToggleWishlist }) {
   const [recommendations, setRecommendations] = useState([]);
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
-  const [isWishlisted, setIsWishlisted] = useState(false);
 
   // Mock multiple images for gallery (in real app, get from product)
   const images = [product.image, product.image, product.image, product.image];
-
-useEffect(() => {
-  const checkWishlist = async () => {
-    try {
-      const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/wishlist/${localStorage.getItem("userId")}`
-      );
-      const data = await res.json();
-
-      setIsWishlisted(
-        data.some(item => item.productId._id === product._id)
-      );
-    } catch (err) {
-      console.error("Wishlist check failed", err);
-    }
-  };
-
-  if (product?._id) {
-    checkWishlist();
-  }
-}, [product]);
-
-
-const toggleWishlist = async () => {
-  try {
-    // optimistic UI
-    setIsWishlisted(prev => !prev);
-
-    await fetch(`${import.meta.env.VITE_API_URL}/wishlist/toggle`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        userId: localStorage.getItem("userId"),
-        productId: product._id
-      })
-    });
-  } catch (err) {
-    console.error("Wishlist toggle failed", err);
-    // rollback UI if API fails
-    setIsWishlisted(prev => !prev);
-  }
-};
+  const isWishlisted = wishlist.includes(product._id);
 
 
   const handleAddToCart = () => {
@@ -135,17 +94,18 @@ const toggleWishlist = async () => {
                 {/* Action Buttons Overlay */}
                 <div className="absolute top-4 right-4 flex space-x-2">
                   <button
-                          onClick={toggleWishlist}
-                          className={`p-3 rounded-full backdrop-blur-md shadow-lg transition-all ${
-                            isWishlisted
-                              ? 'bg-red-500 text-white scale-110'
-                              : isDarkMode
-                                ? 'bg-slate-800/80 hover:bg-red-500 text-white'
-                                : 'bg-white/90 hover:bg-red-500 hover:text-white text-gray-800'
-                          }`}
-                        >
-                          <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-white' : ''}`} />
-                    </button>
+                        onClick={() => onToggleWishlist(product._id)}
+                        className={`p-3 rounded-full backdrop-blur-md shadow-lg transition-all ${
+                          isWishlisted
+                            ? 'bg-red-500 text-white scale-110'
+                            : isDarkMode
+                              ? 'bg-slate-800/80 hover:bg-red-500 text-white'
+                              : 'bg-white/90 hover:bg-red-500 hover:text-white text-gray-800'
+                        }`}
+                      >
+                        <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-white' : ''}`} />
+                      </button>
+
                   <button className={`p-3 rounded-full backdrop-blur-md shadow-lg transition-all ${
                     isDarkMode
                       ? 'bg-slate-800/80 hover:bg-emerald-500 text-white'
