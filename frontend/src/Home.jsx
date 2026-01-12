@@ -31,7 +31,7 @@ useEffect(() => {
       });
       if (!userRes.ok) throw new Error("Not authenticated");
       const userData = await userRes.json();
-      setCurrentUser(userData.user); // ✅ store user info
+      setCurrentUser(userData.user); // store user info
 
       const userId = userData.user._id;
       setUserId(userId);
@@ -62,6 +62,10 @@ useEffect(() => {
 
   fetchData();
 }, []);
+useEffect(() => {
+  console.log("showWishlist:", showWishlist);
+}, [showWishlist]);
+
 
   const addToCart = (product) => {
     const existing = cart.find(item => item._id === product._id);
@@ -122,7 +126,7 @@ useEffect(() => {
         onCartClick={() => setShowCart(true)}
         onLogout={onLogout}
         onProfileClick={() => setShowProfile(true)}
-        WhishlistClick={() => setShowWishlist(true)}
+        WishlistClick={() => setShowWishlist(true)}
         wishlistCount={wishlist.length}
         userId={userId}
         isDarkMode={isDarkMode}           // ✅ ADD THIS

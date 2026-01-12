@@ -95,7 +95,7 @@ useEffect(() => {
               {/* Wishlist */}
               <button
                   onClick={WishlistClick}
-                  className={`hidden md:block relative p-3 rounded-full transition-all duration-300 ${
+                  className={`relative p-3 rounded-full transition-all duration-300 ${
                     isDarkMode ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-900'
                   } hover:scale-110`}
                 >
