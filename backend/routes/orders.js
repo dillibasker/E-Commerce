@@ -21,13 +21,6 @@ router.post('/', authMiddleware, async (req, res) => {
 
     await order.save();
 
-    try {
-      await sendOrderEmail(order);
-    } catch (emailError) {
-      console.error("Email error:", emailError.message);
-      // Email error should not block the order
-    }
-
     res.status(201).json(order);
   } catch (error) {
     res.status(400).json({ message: error.message });
