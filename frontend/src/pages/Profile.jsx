@@ -13,7 +13,7 @@ export default function Profile({ onBack = () => {} }) {
 
   const fetchUser = async () => {
     try {
-      const res = await fetch('https://e-commerce-dzr4.onrender.com/api/auth/me', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/me`, {
         credentials: 'include'
       });
 
@@ -27,7 +27,7 @@ export default function Profile({ onBack = () => {} }) {
 
   const fetchOrders = async () => {
     try {
-      const res = await fetch('https://e-commerce-dzr4.onrender.com/api/orders/my', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/orders/my`, {
         credentials: 'include'
       });
 

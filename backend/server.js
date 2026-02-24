@@ -29,11 +29,6 @@ app.use(cookieParser());
 // ✅ DB
 connectDB();
 
-// ✅ Health check
-app.get('/', (req, res) => {
-  res.send('Backend is running!');
-});
-
 // ✅ Routes
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
