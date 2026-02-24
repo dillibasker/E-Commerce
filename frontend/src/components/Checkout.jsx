@@ -16,45 +16,72 @@ export default function Checkout({ cart, total, onClose, onSuccess, isDarkMode }
   const discount = promoApplied ? total * 0.1 : 0;
   const finalTotal = total - discount;
 
-  const handleSubmit = async () => {
-    if (!formData.customerName || !formData.customerEmail || !formData.customerPhone || !formData.address) {
-      alert('Please fill all fields');
-      return;
-    }
-    
-    setLoading(true);
+const handleSubmit = async () => {
+  if (!formData.customerName || !formData.customerEmail || !formData.customerPhone || !formData.address) {
+    alert('Please fill all fields');
+    return;
+  }
 
-    const orderData = {
-      items: cart.map(item => ({
-        productId: item._id,
-        name: item.name,
-        price: item.price,
-        quantity: item.quantity
-      })),
-      total: finalTotal,
-      ...formData
-    };
+  setLoading(true);
 
-    try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/orders`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(orderData)
-      });
+  const orderData = {
+    items: cart.map(item => ({
+      productId: item._id,
+      name: item.name,
+      price: item.price,
+      quantity: item.quantity
+    })),
+    total: finalTotal,
+    ...formData
+  };
 
-      if (res.ok) {
+  try {
+    // STEP 1: Create Razorpay Order
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/orders/create-razorpay-order`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(orderData)
+    });
+
+    const data = await res.json();
+
+    const options = {
+      key: import.meta.env.VITE_RAZORPAY_KEY,
+      amount: data.razorpayOrder.amount,
+      currency: "INR",
+      name: "Your Store",
+      order_id: data.razorpayOrder.id,
+      handler: async function (response) {
+
+        // STEP 2: Verify Payment
+        await fetch(`${import.meta.env.VITE_API_URL}/orders/verify-payment`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ...response,
+            orderId: data.orderId
+          })
+        });
+
         setSuccess(true);
+
         setTimeout(() => {
           onSuccess();
         }, 2500);
       }
-    } catch (error) {
-      console.error('Error:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+
+    const rzp = new window.Razorpay(options);
+    rzp.open();
+
+  } catch (error) {
+    console.error(error);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const applyPromo = () => {
     if (promoCode.toLowerCase() === 'save10') {
