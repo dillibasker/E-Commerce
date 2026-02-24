@@ -3,13 +3,15 @@ import Order from '../models/Order.js';
 import authMiddleware from '../middleware/authMiddleware.js';
 import Razorpay from 'razorpay';
 import crypto from 'crypto';
+
 const router = express.Router();
-const razorpay = new Razorpay({
+
+/* CREATE ORDER */
+router.post('/create-razorpay-order', authMiddleware, async (req, res) => {
+  const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
   key_secret: process.env.RAZORPAY_SECRET
 });
-/* CREATE ORDER */
-router.post('/create-razorpay-order', authMiddleware, async (req, res) => {
   try {
     const { items, total, customerName, customerEmail, customerPhone, address } = req.body;
 
