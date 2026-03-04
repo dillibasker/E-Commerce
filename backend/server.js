@@ -11,6 +11,8 @@ import wishlistRoutes from "./routes/wishlist.routes.js";
 import cookieParser from 'cookie-parser';
 import recommendRoutes from "./routes/recommend.routes.js";
 import fetch from 'node-fetch';
+import aiRoutes from "./ai/routes/aiRoutes.js";
+
 
 dotenv.config();
 
@@ -35,6 +37,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/recommend', recommendRoutes);
 app.use("/api/wishlist", wishlistRoutes);
+app.use("/api/ai", aiRoutes);
 
 // ✅ Seed route
 app.post('/api/seed', async (req, res) => {
