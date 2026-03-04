@@ -13,14 +13,11 @@ import recommendRoutes from "./routes/recommend.routes.js";
 import fetch from 'node-fetch';
 import aiRoutes from "./ai/routes/aiRoutes.js";
 
-
-dotenv.config();
-
 const app = express();
 
 app.use(cors({
   origin: [
-    "https://e-commerce-steel-one.vercel.app"
+    "http://localhost:5173"
   ],
   credentials: true
 }));
