@@ -40,9 +40,8 @@ export default function Signup({ goToLogin = () => {} }) {
       const data = await res.json();
 
       if (res.ok) {
-        setToast({ message: 'Signup successful! Redirecting to login...', type: 'success' });
-        setTimeout(goToLogin, 1800);
-      } else {
+        window.location.href = `/verification?email=${email}`;
+      }else {
         setToast({ message: data.message, type: 'error' });
       }
     } catch (error) {

@@ -21,7 +21,11 @@ const userSchema = new mongoose.Schema(
       required: true
     },
     sessionToken: { type: String },
-
+    verificationToken: String,
+isVerified: {
+  type: Boolean,
+  default: false
+},
     resetToken: { type: String },
     resetTokenExpiry: { type: Date },
   },

@@ -21,32 +21,70 @@ export default function Login({ onLogin = () => {}, goToSignup = () => {} }) {
   });
   const [answer, setAnswer] = useState('');
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          username,
-          password,
-          captchaAnswer: Number(answer),
-          captchaExpected: captcha.a + captcha.b
-        })
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setToast({ message: 'Login successful!', type: 'success' });
-        setTimeout(onLogin, 1800);
-      } else {
-        setToast({ message: data.message, type: 'error' });
+  try {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username,
+        password,
+        captchaAnswer: Number(answer),
+        captchaExpected: captcha.a + captcha.b
+      })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      // ✅ Handle unverified email
+      if (data.message === "Please verify your email before logging in") {
+        window.location.href = `/verification?email=${email}`;
+        return;
       }
-    } catch (error) {
-      setToast({ message: 'Connection error. Please try again.', type: 'error' });
+
+      setToast({ message: data.message, type: 'error' });
+      return;
     }
-  };
+
+    // ✅ SUCCESS LOGIN
+    setToast({ message: 'Login successful!', type: 'success' });
+    
+    // Call parent login handler
+    onLogin();
+
+  } catch (error) {
+    setToast({ message: 'Connection error. Please try again.', type: 'error' });
+  }
+};
+
+const handleResendVerification = async () => {
+  if (!email) {
+    setToast({ message: 'Enter your email first', type: 'error' });
+    return;
+  }
+
+  try {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/resend-verification`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      setToast({ message: 'Verification email resent!', type: 'success' });
+    } else {
+      setToast({ message: data.message, type: 'error' });
+    }
+  } catch (err) {
+    setToast({ message: 'Failed to resend email', type: 'error' });
+  }
+};
 
   const handleForgotPassword = async () => {
     if (!email) {

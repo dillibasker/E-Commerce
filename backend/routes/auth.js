@@ -6,31 +6,139 @@ import nodemailer from 'nodemailer';
 
 const router = express.Router();
 
-/* ================= SIGN UP ================= */
 router.post('/signup', async (req, res) => {
   try {
-    const { username,email, password, captchaAnswer, captchaExpected } = req.body;
+    const { username, email, password, captchaAnswer, captchaExpected } = req.body;
 
-        if (Number(captchaAnswer) !== Number(captchaExpected)) {
+    if (Number(captchaAnswer) !== Number(captchaExpected)) {
       return res.status(400).json({ message: 'Captcha verification failed' });
     }
 
+    const existingUser = await User.findOne({ 
+      $or: [{ username }, { email }] 
+    });
 
-    // Check existing user
-    const existingUser = await User.findOne({ username });
     if (existingUser) {
-      return res.status(400).json({ message: 'Username already exists' });
+      return res.status(400).json({ message: 'User already exists' });
     }
 
-const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-const user = await User.create({
-  username,
-  email,
-  password: hashedPassword
+    // ✅ Generate verification token
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+
+    const user = await User.create({
+      username,
+      email,
+      password: hashedPassword,
+      verificationToken,
+      isVerified: false
+    });
+
+    // ✅ Send verification email
+    const transporter = nodemailer.createTransport({
+      service: 'Gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+      }
+    });
+
+    const verifyLink = `${process.env.BASE_URL}/api/auth/verify/${verificationToken}`;
+
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: 'Verify Your Email',
+      html: `
+        <h2>Email Verification</h2>
+        <p>Click below to verify your account:</p>
+        <a href="${verifyLink}">Verify Email</a>
+      `
+    });
+
+    res.status(201).json({
+      message: 'Registration successful. Please verify your email.'
+    });
+
+  } catch (error) {
+  console.error("SIGNUP ERROR:", error); // 👈 ADD THIS
+  res.status(500).json({ message: "Server error" });
+}
 });
 
-    res.status(201).json({ message: 'User registered successfully' });
+router.get("/check-verification/:email", async (req, res) => {
+  try {
+    const user = await User.findOne({ email: req.params.email });
+
+    if (!user) {
+      return res.status(404).json({ verified: false });
+    }
+
+    res.json({ verified: user.isVerified });
+
+  } catch (error) {
+    res.status(500).json({ verified: false });
+  }
+});
+
+router.get('/verify/:token', async (req, res) => {
+  try {
+    const user = await User.findOne({
+      verificationToken: req.params.token
+    });
+
+    if (!user) {
+      return res.status(400).send('Invalid or expired token');
+    }
+
+    user.isVerified = true;
+    user.verificationToken = undefined;
+
+    await user.save();
+
+res.redirect(`${process.env.FRONTEND_URL}/verification-success`);
+  } catch (error) {
+    res.status(500).send('Verification failed');
+  }
+});
+
+router.post('/login', async (req, res) => {
+  try {
+    const { username, captchaAnswer, captchaExpected } = req.body;
+
+    if (captchaAnswer !== captchaExpected) {
+      return res.status(400).json({ message: 'Captcha verification failed' });
+    }
+
+    const user = await User.findOne({
+      $or: [{ username }, { email: username }]
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid user' });
+    }
+
+    // ✅ ADD THIS CHECK
+    if (!user.isVerified) {
+      return res.status(401).json({
+        message: 'Please verify your email before logging in',
+        notVerified: true   // ✅ ADD THIS
+      });
+    }
+
+    const token = crypto.randomBytes(32).toString('hex');
+    user.sessionToken = token;
+    await user.save();
+
+    res.cookie('sessionToken', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      path: '/',
+      maxAge: 24 * 60 * 60 * 1000
+    }).json({ message: 'Login successful' });
+
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -65,47 +173,6 @@ router.get('/me', async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
-
-
-
-/* ================= LOGIN ================= */
-router.post('/login', async (req, res) => {
-  try {
-    const { username, captchaAnswer, captchaExpected } = req.body;
-
-    // Captcha check
-    if (captchaAnswer !== captchaExpected) {
-      return res.status(400).json({ message: 'Captcha verification failed' });
-    }
-
-const user = await User.findOne({
-  $or: [{ username }, { email: username }]
-});
-    if (!user) {
-      return res.status(400).json({ message: 'Invalid user' });
-    }
-    
-
-
-    // Create a simple session token (could also use JWT)
-    const token = crypto.randomBytes(32).toString('hex');
-    user.sessionToken = token;
-    await user.save();
-      res.cookie('sessionToken', token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production', // ✅ only true in production
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        path: '/',
-        maxAge: 24 * 60 * 60 * 1000 // 1 day
-      })
-
-
-      .json({ message: 'Login successful' });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
 // Forgot Password
 router.post('/forgot-password', async (req, res) => {
   const { email } = req.body;

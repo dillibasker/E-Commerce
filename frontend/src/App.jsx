@@ -3,6 +3,7 @@ import Login from './pages/login';
 import Signup from './pages/Signup';
 import Home from './Home';
 import Profile from './pages/Profile';
+import Verification from './pages/Verification';
 
 function App() {
   const [isAuth, setIsAuth] = useState(false);
@@ -24,8 +25,13 @@ function App() {
   }, []);
 
   const handleLogin = () => {
+    setPage('verification');
+  };
+
+    const handleVerificationSuccess = () => {
     localStorage.setItem('isAuth', 'true');
     setIsAuth(true);
+    setPage('home');
   };
 
   const handleLogout = () => {
@@ -44,24 +50,29 @@ function App() {
     });
   };
 
-  if (!isAuth) {
-    return page === 'login' ? (
-      <Login
-        onLogin={handleLogin}
-        goToSignup={() => setPage('signup')}
-      />
-    ) : (
-      <Signup goToLogin={() => setPage('login')} />
-    );
-  }
+   if (!isAuth) {
+    if (page === 'login') {
+      return (
+        <Login
+          onLogin={handleLogin}
+          goToSignup={() => setPage('signup')}
+        />
+      );
+    }
 
-  if (showProfile) {
-    return (
-      <Profile 
-        onBack={() => setShowProfile(false)} 
-        isDarkMode={isDarkMode} // ✅ ADD THIS
-      />
-    );
+    if (page === 'signup') {
+      return (
+        <Signup goToLogin={() => setPage('login')} />
+      );
+    }
+
+    if (page === 'verification') {
+      return (
+        <Verification
+          onVerifySuccess={handleVerificationSuccess}
+        />
+      );
+    }
   }
   
   return (
