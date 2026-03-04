@@ -1,7 +1,7 @@
 import express from "express";
 import FutureEvent from "../models/FutureEvent.js";
 import FutureCart from "../models/FutureCart.js";
-import Product from "../../backend/ai/models/Product.js";
+import Product from "../../models/Product.js";
 import { generateFutureCart } from "../services/cartGenerator.js";
 import { chatWithFutureSelf } from "../services/futureSelfChat.js";
 
