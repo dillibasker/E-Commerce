@@ -9,7 +9,8 @@ function App() {
   const [isAuth, setIsAuth] = useState(false);
   const [page, setPage] = useState('login');
   const [showProfile, setShowProfile] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false); // ✅ ADD THIS
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [verifyEmail, setVerifyEmail] = useState(null);
 
   useEffect(() => {
     const savedAuth = localStorage.getItem('isAuth');
@@ -24,9 +25,20 @@ function App() {
     }
   }, []);
 
-  const handleLogin = () => {
+const handleLogin = (email = null) => {
+
+  // if email exists → user not verified
+  if (email) {
+    setVerifyEmail(email);
     setPage('verification');
-  };
+    return;
+  }
+
+  // verified user → go to home
+  localStorage.setItem('isAuth', 'true');
+  setIsAuth(true);
+  setPage('home');
+};
 
     const handleVerificationSuccess = () => {
     localStorage.setItem('isAuth', 'true');
@@ -61,14 +73,21 @@ function App() {
     }
 
     if (page === 'signup') {
-      return (
-        <Signup goToLogin={() => setPage('login')} />
-      );
-    }
+  return (
+    <Signup
+  goToLogin={() => setPage('login')}
+  goToVerification={(email) => {
+    setVerifyEmail(email);
+    setPage('verification');
+  }}
+/>
+  );
+}
 
     if (page === 'verification') {
       return (
         <Verification
+          email={verifyEmail}
           onVerifySuccess={handleVerificationSuccess}
         />
       );

@@ -1,6 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import dns from "dns"
+dns.setServers(["1.1.1.1", "8.8.8.8"])
 dotenv.config();   
 import { connectDB } from './config/db.js';
 import productRoutes from './routes/products.js';
@@ -13,8 +15,8 @@ import recommendRoutes from "./routes/recommend.routes.js";
 import fetch from 'node-fetch';
 import aiRoutes from "./ai/routes/aiRoutes.js";
 
-const app = express();
 
+const app = express()
 app.use(cors({
   origin: [
     "http://localhost:5173"

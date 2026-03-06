@@ -9,8 +9,7 @@ const Toast = ({ message, type, onClose }) => (
   </div>
 );
 
-export default function Signup({ goToLogin = () => {} }) {
-  const [username, setUsername] = useState('');
+export default function Signup({ goToLogin = () => {}, goToVerification = () => {} }) {  const [username, setUsername] = useState('');
   const [toast, setToast] = useState(null);
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
@@ -40,9 +39,11 @@ export default function Signup({ goToLogin = () => {} }) {
       const data = await res.json();
 
       if (res.ok) {
-        window.location.href = `/verification?email=${email}`;
-      }else {
-        setToast({ message: data.message, type: 'error' });
+        setToast({ message: "Account created. Please verify your email.", type: "success" });
+
+        setTimeout(() => {
+          goToVerification(email);
+        }, 1000);
       }
     } catch (error) {
       setToast({ message: 'Connection error. Please try again.', type: 'error' });

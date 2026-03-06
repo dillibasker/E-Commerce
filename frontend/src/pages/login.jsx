@@ -38,20 +38,25 @@ const handleSubmit = async (e) => {
     });
 
     const data = await res.json();
+if (!res.ok) {
 
-    if (!res.ok) {
-      // ✅ Handle unverified email
-      if (data.message === "Please verify your email before logging in") {
-        window.location.href = `/verification?email=${email}`;
-        return;
-      }
+  if (data.notVerified) {
+    setToast({ message: data.message, type: 'error' });
 
-      setToast({ message: data.message, type: 'error' });
-      return;
-    }
+    // go to verification page
+    setTimeout(() => {
+      onLogin(email);
+    }, 1000);
 
-    // ✅ SUCCESS LOGIN
-    setToast({ message: 'Login successful!', type: 'success' });
+    return;
+  }
+
+  setToast({ message: data.message, type: 'error' });
+  return;
+}
+
+// ✅ SUCCESS LOGIN
+setToast({ message: 'Login successful!', type: 'success' });
     
     // Call parent login handler
     onLogin();

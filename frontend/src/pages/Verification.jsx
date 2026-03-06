@@ -1,21 +1,15 @@
 import { useEffect, useState } from "react";
 
-export default function Verification() {
+export default function Verification({ email, onVerifySuccess }) {
   const [verified, setVerified] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const API_URL = import.meta.env.VITE_API_URL;
 
-  const params = new URLSearchParams(window.location.search);
-  const email = params.get("email");
-
   useEffect(() => {
     const checkVerification = async () => {
       try {
-        const res = await fetch(
-          `${API_URL}/auth/check-verification/${email}`
-        );
-
+        const res = await fetch(`${API_URL}/auth/check-verification/${email}`);
         const data = await res.json();
 
         if (data.verified) {
@@ -27,6 +21,8 @@ export default function Verification() {
         setLoading(false);
       }
     };
+
+    if (!email) return;
 
     checkVerification();
 
@@ -45,35 +41,38 @@ export default function Verification() {
         </h2>
 
         <p className="text-slate-400 mb-6 text-sm">
-          We sent a verification link to:
+          Verification link sent to:
           <br /><br />
           <span className="text-cyan-400 font-medium">{email}</span>
         </p>
 
-        {loading && (
+        {loading && !verified && (
           <div className="flex justify-center mb-6">
             <div className="w-6 h-6 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin"></div>
           </div>
         )}
 
-        {verified ? (
-          <p className="text-green-400 font-medium">
-            ✅ Email Verified! Redirecting to home...
+        {!verified ? (
+          <p className="text-slate-400 text-sm mb-6">
+            Waiting for email verification...
           </p>
         ) : (
-          <p className="text-slate-400 text-sm">
-            Waiting for verification...
+          <p className="text-green-400 font-semibold mb-6 text-lg">
+            ✅ Email Verified Successfully!
           </p>
         )}
 
-        {verified && (
-  <button
-    onClick={() => window.location.href = "/login"}
-    className="bg-cyan-500 px-6 py-2 rounded-lg text-white"
-  >
-    Back to Login
-  </button>
-)}
+        <button
+          disabled={!verified}
+          onClick={() => window.location.href = "/login"}
+          className={`px-6 py-2 rounded-lg text-white transition ${
+            verified
+              ? "bg-cyan-500 hover:bg-cyan-600"
+              : "bg-slate-600 cursor-not-allowed"
+          }`}
+        >
+          Back to Login
+        </button>
 
       </div>
     </div>

@@ -44,8 +44,7 @@ router.post('/signup', async (req, res) => {
       }
     });
 
-    const verifyLink = `${process.env.BASE_URL}/api/auth/verify/${verificationToken}`;
-
+const verifyLink = `${process.env.BASE_URL}/api/auth/verify/${verificationToken}`;
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to: email,
@@ -82,24 +81,25 @@ router.get("/check-verification/:email", async (req, res) => {
   }
 });
 
-router.get('/verify/:token', async (req, res) => {
+router.get("/verify/:token", async (req, res) => {
   try {
+
     const user = await User.findOne({
       verificationToken: req.params.token
     });
 
     if (!user) {
-      return res.status(400).send('Invalid or expired token');
+      return res.send("Invalid or expired token");
     }
 
     user.isVerified = true;
-    user.verificationToken = undefined;
+    user.verificationToken = null;
 
     await user.save();
 
-res.redirect(`${process.env.FRONTEND_URL}/verification-success`);
+res.send("Email verified successfully. You can return to the app.");
   } catch (error) {
-    res.status(500).send('Verification failed');
+    res.status(500).send("Verification failed");
   }
 });
 
@@ -107,8 +107,8 @@ router.post('/login', async (req, res) => {
   try {
     const { username, captchaAnswer, captchaExpected } = req.body;
 
-    if (captchaAnswer !== captchaExpected) {
-      return res.status(400).json({ message: 'Captcha verification failed' });
+  if (Number(captchaAnswer) !== Number(captchaExpected)) {
+        return res.status(400).json({ message: 'Captcha verification failed' });
     }
 
     const user = await User.findOne({
