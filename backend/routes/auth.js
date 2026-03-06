@@ -3,9 +3,60 @@ import bcrypt from 'bcryptjs';
 import User from '../models/User.js';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
+import { OAuth2Client } from "google-auth-library";
 
 const router = express.Router();
 
+const client = new OAuth2Client(
+  "27356358338-njcl9fc07eds8e227ld3k3tfh30tkkr9.apps.googleusercontent.com"
+);
+
+router.post("/google-login", async (req, res) => {
+  try {
+    const { idToken } = req.body;
+    console.log("TOKEN RECEIVED:", idToken);
+    const ticket = await client.verifyIdToken({
+      idToken,
+      audience: "27356358338-njcl9fc07eds8e227ld3k3tfh30tkkr9.apps.googleusercontent.com",
+    });
+
+    const payload = ticket.getPayload();
+    console.log("PAYLOAD:", payload);
+    const email = payload.email;
+    const username = payload.name;
+
+    let user = await User.findOne({ email });
+
+    if (!user) {
+     user = await User.create({
+      username,
+      email,
+      googleUser: true,
+      isVerified: true
+    });
+    }
+
+    // ✅ CREATE SESSION TOKEN (same like normal login)
+    const token = crypto.randomBytes(32).toString("hex");
+    user.sessionToken = token;
+    await user.save();
+
+    // ✅ SET COOKIE
+    res.cookie("sessionToken", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      path: "/",
+      maxAge: 24 * 60 * 60 * 1000
+    });
+
+    res.json({ message: "Google login success", user });
+
+  } catch (err) {
+    console.error("GOOGLE LOGIN ERROR:", err);
+    res.status(401).json({ message: "Invalid Google token" });
+  }
+});
 router.post('/signup', async (req, res) => {
   try {
     const { username, email, password, captchaAnswer, captchaExpected } = req.body;

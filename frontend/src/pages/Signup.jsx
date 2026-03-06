@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState ,useEffect } from 'react';
 import { UserPlus, Mail, User, Lock } from 'lucide-react';
 
 const Toast = ({ message, type, onClose }) => (
@@ -20,11 +20,68 @@ export default function Signup({ goToLogin = () => {}, goToVerification = () => 
   });
   const [answer, setAnswer] = useState('');
 
+const API_URL = import.meta.env.VITE_API_URL;
+
+
+  useEffect(() => {
+    if (window.google) {
+      window.google.accounts.id.initialize({
+        client_id: "27356358338-njcl9fc07eds8e227ld3k3tfh30tkkr9.apps.googleusercontent.com",
+        callback: handleGoogleResponse,
+      });
+
+      window.google.accounts.id.renderButton(
+        document.getElementById("googleBtn"),
+        {
+          theme: "outline",
+          size: "large",
+          width: 340,
+        }
+      );
+    }
+  }, []);
+
+const handleGoogleResponse = async (response) => {
+  console.log("Google response:", response);
+    try {
+      const res = await fetch(`${API_URL}/auth/google-login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          idToken: response.credential,
+        }),
+        credentials: "include",
+      });
+      
+      const data = await res.json();
+      console.log("Backend response:", data);
+      if (res.ok) {
+        setToast({
+          message: "Google login successful",
+          type: "success",
+        });
+      } else {
+        setToast({
+          message: data.message || "Google login failed",
+          type: "error",
+        });
+      }
+
+    } catch (error) {
+      setToast({
+        message: "Google login failed",
+        type: "error",
+      });
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/signup`, {
+      const res = await fetch(`${API_URL}/auth/signup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -45,6 +102,7 @@ export default function Signup({ goToLogin = () => {}, goToVerification = () => 
           goToVerification(email);
         }, 1000);
       }
+
     } catch (error) {
       setToast({ message: 'Connection error. Please try again.', type: 'error' });
     }
@@ -143,6 +201,16 @@ export default function Signup({ goToLogin = () => {}, goToVerification = () => 
               <UserPlus className="w-4 h-4" />
               Create Account
             </button>
+
+            {/* Divider */}
+            <div className="flex items-center my-4">
+              <div className="flex-1 h-px bg-purple-700"></div>
+              <span className="px-3 text-purple-300 text-xs">OR</span>
+              <div className="flex-1 h-px bg-purple-700"></div>
+            </div>
+
+            {/* Google Button */}
+            <div id="googleBtn" className="flex justify-center"></div>``
 
             {/* Login Link */}
             <p className="text-center mt-5 text-purple-300 text-sm">
