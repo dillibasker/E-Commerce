@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState ,useEffect  } from 'react';
 import { Lock, Mail, User, LogIn, ArrowRight } from 'lucide-react';
 
 const Toast = ({ message, type, onClose }) => (
@@ -20,100 +20,142 @@ export default function Login({ onLogin = () => {}, goToSignup = () => {} }) {
     return { a, b };
   });
   const [answer, setAnswer] = useState('');
+    const API_URL = import.meta.env.VITE_API_URL;
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+      useEffect(() => {
+    if (window.google) {
+      window.google.accounts.id.initialize({
+        client_id:
+          "27356358338-njcl9fc07eds8e227ld3k3tfh30tkkr9.apps.googleusercontent.com",
+        callback: handleGoogleResponse
+      });
+
+      window.google.accounts.id.renderButton(
+        document.getElementById("googleLoginBtn"),
+        {
+          theme: "outline",
+          size: "large",
+          width: 360
+        }
+      );
+    }
+  }, []);
+
+const handleGoogleResponse = async (response) => {
+    try {
+
+      const res = await fetch(`${API_URL}/auth/google-login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          idToken: response.credential
+        })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setToast({ message: "Google login successful!", type: "success" });
+        onLogin();
+      } else {
+        setToast({ message: data.message || "Google login failed", type: "error" });
+      }
+
+    } catch (err) {
+      setToast({ message: "Google login failed", type: "error" });
+    }
+  };
+
+  /* ---------------- NORMAL LOGIN ---------------- */
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+
+      const res = await fetch(`${API_URL}/auth/login`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username,
+          password,
+          captchaAnswer: Number(answer),
+          captchaExpected: captcha.a + captcha.b
+        })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+
+        if (data.notVerified) {
+          setToast({ message: data.message, type: 'error' });
+
+          setTimeout(() => {
+            onLogin(email);
+          }, 1000);
+
+          return;
+        }
+
+        setToast({ message: data.message, type: 'error' });
+        return;
+      }
+
+      setToast({ message: 'Login successful!', type: 'success' });
+
+      onLogin();
+
+    } catch (error) {
+      setToast({ message: 'Connection error. Please try again.', type: 'error' });
+    }
+  };
+
+const handleForgotPassword = async () => {
+
+  if (!email.trim()) {
+    setToast({ message: "Enter your email first", type: "error" });
+    return;
+  }
 
   try {
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
+
+    const res = await fetch(`${API_URL}/auth/forgot-password`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      credentials: "include",
       body: JSON.stringify({
-        username,
-        password,
-        captchaAnswer: Number(answer),
-        captchaExpected: captcha.a + captcha.b
+        email: email.trim()
       })
-    });
-
-    const data = await res.json();
-if (!res.ok) {
-
-  if (data.notVerified) {
-    setToast({ message: data.message, type: 'error' });
-
-    // go to verification page
-    setTimeout(() => {
-      onLogin(email);
-    }, 1000);
-
-    return;
-  }
-
-  setToast({ message: data.message, type: 'error' });
-  return;
-}
-
-// ✅ SUCCESS LOGIN
-setToast({ message: 'Login successful!', type: 'success' });
-    
-    // Call parent login handler
-    onLogin();
-
-  } catch (error) {
-    setToast({ message: 'Connection error. Please try again.', type: 'error' });
-  }
-};
-
-const handleResendVerification = async () => {
-  if (!email) {
-    setToast({ message: 'Enter your email first', type: 'error' });
-    return;
-  }
-
-  try {
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/resend-verification`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email })
     });
 
     const data = await res.json();
 
     if (res.ok) {
-      setToast({ message: 'Verification email resent!', type: 'success' });
+      setToast({
+        message: "Reset link sent to your email",
+        type: "success"
+      });
     } else {
-      setToast({ message: data.message, type: 'error' });
+      setToast({
+        message: data.message || "Failed to send reset email",
+        type: "error"
+      });
     }
+
   } catch (err) {
-    setToast({ message: 'Failed to resend email', type: 'error' });
+    setToast({
+      message: "Server connection error",
+      type: "error"
+    });
   }
 };
-
-  const handleForgotPassword = async () => {
-    if (!email) {
-      setToast({ message: 'Please enter your registered email', type: 'error' });
-      return;
-    }
-
-    try {
-      const res = await fetch(`https://e-commerce-dzr4.onrender.com/api/auth/forgot-password`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
-      });
-
-      const data = await res.json();
-      if (res.ok) {
-        setToast({ message: 'Password reset email sent!', type: 'success' });
-      } else {
-        setToast({ message: data.message, type: 'error' });
-      }
-    } catch (error) {
-      setToast({ message: 'Connection error. Please try again.', type: 'error' });
-    }
-  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
@@ -269,6 +311,18 @@ const handleResendVerification = async () => {
             <LogIn className="w-5 h-5" />
             Sign In
           </button>
+
+          {/* DIVIDER */}
+
+            <div className="flex items-center my-6">
+              <div className="flex-1 h-px bg-slate-600"></div>
+              <span className="px-3 text-slate-400 text-sm">OR</span>
+              <div className="flex-1 h-px bg-slate-600"></div>
+            </div>
+
+            {/* GOOGLE LOGIN BUTTON */}
+
+            <div id="googleLoginBtn" className="flex justify-center"></div>
 
           {/* Sign Up Link */}
           <p className="text-center mt-6 text-slate-400">

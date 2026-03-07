@@ -156,7 +156,7 @@ res.send("Email verified successfully. You can return to the app.");
 
 router.post('/login', async (req, res) => {
   try {
-    const { username, captchaAnswer, captchaExpected } = req.body;
+    const { username, password ,captchaAnswer, captchaExpected } = req.body;
 
   if (Number(captchaAnswer) !== Number(captchaExpected)) {
         return res.status(400).json({ message: 'Captcha verification failed' });
@@ -170,11 +170,16 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ message: 'Invalid user' });
     }
 
-    // ✅ ADD THIS CHECK
+   const isMatch = await user.matchPassword(password);
+
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Incorrect password' });
+    }
+
     if (!user.isVerified) {
       return res.status(401).json({
         message: 'Please verify your email before logging in',
-        notVerified: true   // ✅ ADD THIS
+        notVerified: true
       });
     }
 
@@ -265,7 +270,7 @@ router.post('/reset-password/:token', async (req, res) => {
     const user = await User.findOne({ resetToken: token, resetTokenExpiry: { $gt: Date.now() } });
     if (!user) return res.status(400).json({ message: 'Invalid or expired token' });
 
-    user.password = await bcrypt.hash(password, 10);
+    user.password = password;
     user.resetToken = undefined;
     user.resetTokenExpiry = undefined;
     await user.save();
