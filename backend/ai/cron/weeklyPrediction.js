@@ -1,7 +1,7 @@
 import cron from "node-cron";
-import User from "../models/User.js";
-import FutureEvent from "../../../ai/models/FutureEvent.js";
-import { predictLifeEvents } from "../../../ai/services/eventPredictor.js";
+import User from "../../models/User.js";
+import FutureEvent from "../models/FutureEvent.js";
+import { predictLifeEvents } from "../services/eventPredictor.js";
 
 cron.schedule("0 0 * * 0", async () => {
   const users = await User.find();

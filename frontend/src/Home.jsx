@@ -6,6 +6,7 @@ import Cart from './components/Cart';
 import Checkout from './components/Checkout';
 import Profile from "./pages/Profile";
 import Wishlist from "./pages/Wishlist";
+import FuturePredictions from "./components/FuturePredictions";
 
 function Home({ onLogout, isDarkMode, toggleDarkMode }) { // ✅ ADD THESE PROPS
   const [products, setProducts] = useState([]);
@@ -16,6 +17,8 @@ function Home({ onLogout, isDarkMode, toggleDarkMode }) { // ✅ ADD THESE PROPS
   const [loading, setLoading] = useState(true);
   const [showProfile, setShowProfile] = useState(false);
   const [showWishlist, setShowWishlist] = useState(false);
+    const [showFuturePredictions, setShowFuturePredictions] = useState(false);
+
   const [wishlist, setWishlist] = useState([]);
     const [currentUser, setCurrentUser] = useState(null); // ✅ FIX
   const [userId, setUserId] = useState(null);
@@ -127,6 +130,7 @@ useEffect(() => {
         onLogout={onLogout}
         onProfileClick={() => setShowProfile(true)}
         WishlistClick={() => setShowWishlist(true)}
+        onFutureClick={() => setShowFuturePredictions(true)}
         wishlistCount={wishlist.length}
         userId={userId}
         isDarkMode={isDarkMode}           // ✅ ADD THIS
@@ -134,7 +138,13 @@ useEffect(() => {
       />
 
       {/* PROFILE PAGE */}
-      {showWishlist ? (
+      {showFuturePredictions ? (
+  <FuturePredictions
+    userId={userId}
+    onBack={() => setShowFuturePredictions(false)}
+    isDarkMode={isDarkMode}
+    />
+      ) :showWishlist ? (
             <Wishlist
                 onBack={() => setShowWishlist(false)}
                 isDarkMode={isDarkMode}

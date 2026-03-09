@@ -14,8 +14,7 @@ import cookieParser from 'cookie-parser';
 import recommendRoutes from "./routes/recommend.routes.js";
 import fetch from 'node-fetch';
 import aiRoutes from "./ai/routes/aiRoutes.js";
-
-
+import "./ai/cron/weeklyPrediction.js";
 const app = express()
 app.use(cors({
   origin: [
